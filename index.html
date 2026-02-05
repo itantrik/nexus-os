@@ -1,102 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- ... existing head ... -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nexus OS</title>
+    
+    <!-- CSS Dependencies -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap/dist/css/jsvectormap.min.css" />
+
     <style>
-        /* ... existing styles ... */
+        :root {
+            /* CLEAN LIGHT THEME */
+            --bg-body: #f4f6f8;       
+            --bg-card: #ffffff;       
+            --text-main: #212529;     
+            --text-muted: #6c757d;    
+            --border: #e9ecef;        
+            
+            --primary: #0d6efd;       
+            --success: #198754;       
+            
+            --map-base: #dee2e6;      
+            --map-hover: #ced4da;
+            --map-visited: #0d6efd;   
 
-        /* TICKTICK TASKS UPDATED */
-        .task-item {
-            display: flex; align-items: flex-start; /* Align top for multi-line */
-            padding: 12px 0; border-bottom: 1px solid var(--border);
+            --nav-height: 70px;
         }
-        .task-item:last-child { border-bottom: none; }
-        .task-icon { color: #6c757d; font-size: 1rem; margin-right: 12px; margin-top: 3px; }
-        .task-content { flex-grow: 1; }
-        .task-text { font-weight: 500; font-size: 0.95rem; line-height: 1.4; }
-        .task-date { font-size: 0.75rem; font-weight: 600; margin-top: 2px; }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            padding-bottom: var(--nav-height);
+        }
+
+        h2 { font-weight: 800; color: var(--text-main); font-size: 1.6rem; letter-spacing: -0.5px; }
+        h5 { font-weight: 700; font-size: 1rem; margin-bottom: 12px;}
+
+        /* CARDS */
+        .nexus-card {
+            background-color: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(0,0,0,0.04);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
+        }
+
+        /* MAP */
+        #world-map {
+            width: 100%;
+            height: 340px;
+            background-color: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+        }
         
-        /* Priority Colors */
-        .prio-high { color: #dc3545; }   /* Red */
-        .prio-med { color: #ffc107; }    /* Yellow */
-        .prio-low { color: #0d6efd; }    /* Blue */
-        .prio-none { color: #adb5bd; }   /* Grey */
-
-        /* Date Colors */
-        .date-overdue { color: #dc3545; }
-        .date-today { color: #198754; }
-        .date-future { color: #6c757d; }
-
-        /* ... rest of styles ... */
-    </style>
-</head>
-<body>
-    <!-- ... existing body structure ... -->
-
-    <script>
-        // ... existing config ...
-
-        // --- DASHBOARD (HQ) ---
-        function loadDashboard() {
-            fetch(`${API_URL}?action=getDashboard`)
-            .then(res => res.json())
-            .then(data => {
-                // 1. TickTick Tasks
-                const taskContainer = document.getElementById('task-list');
-                if(!data.tasks || data.tasks.length === 0) {
-                    taskContainer.innerHTML = '<div class="text-center text-muted small py-3">All caught up! No active tasks.</div>';
-                } else {
-                    taskContainer.innerHTML = data.tasks.map(t => {
-                        // Format Date
-                        let dateHtml = "";
-                        if (t.dueDate) {
-                            const dateObj = new Date(t.dueDate);
-                            const now = new Date();
-                            const isToday = dateObj.toDateString() === now.toDateString();
-                            const isOverdue = dateObj < now && !isToday;
-                            
-                            // Formatting
-                            const timeStr = t.isAllDay ? "" : dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                            const dateStr = isToday ? "Today" : dateObj.toLocaleDateString([], {month: 'short', day: 'numeric'});
-                            
-                            const dateClass = isOverdue ? "date-overdue" : (isToday ? "date-today" : "date-future");
-                            dateHtml = `<div class="task-date ${dateClass}">${dateStr} ${timeStr}</div>`;
-                        }
-
-                        // Priority Class (TickTick: 5=High, 3=Med, 1=Low, 0=None) - Mapping varies, usually High=High
-                        // Simplified mapping based on TickTick standard
-                        let prioClass = "prio-none";
-                        if (t.priority === 5) prioClass = "prio-high";
-                        else if (t.priority === 3) prioClass = "prio-med";
-                        else if (t.priority === 1) prioClass = "prio-low";
-
-                        return `
-                        <div class="task-item">
-                            <i class="fa-regular fa-circle task-icon ${prioClass}"></i>
-                            <div class="task-content">
-                                <div class="task-text">${t.title}</div>
-                                ${dateHtml}
-                            </div>
-                        </div>
-                    `}).join('');
-                }
-
-                // 2. Google Docs Journal
-                const journalContainer = document.getElementById('journal-feed');
-                if(data.journal && data.journal.length > 0) {
-                    journalContainer.innerHTML = data.journal.map(j => `
-                        <a href="${j.url}" target="_blank" class="journal-item">
-                            <div class="journal-date">${j.date}</div>
-                            <div class="journal-text">${j.title} <i class="fa-solid fa-arrow-up-right-from-square small ms-1" style="font-size:0.7em"></i></div>
-                        </a>
-                    `).join('');
-                } else {
-                    journalContainer.innerHTML = '<div class="text-center text-muted small py-2">No journals found.</div>';
-                }
-            });
+        /* Custom Tooltip Styling */
+        .jvm-tooltip {
+            background-color: #333;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 9999;
         }
 
-        // ... rest of script ...
-    </script>
-</body>
-</html>
+        /* STATS */
+        .stat-number { font-size: 2rem; font-weight: 800; color: var(--primary); line-height: 1; }
+        .stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-top: 5px;}
+
+        /* FILTERS */
+        .filter-container { white-space: nowrap; overflow-x: auto;
