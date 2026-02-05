@@ -1,332 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nexus OS</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap/dist/css/jsvectormap.min.css" />
-
+    <!-- ... existing head ... -->
     <style>
-        :root {
-            /* CLEAN LIGHT THEME */
-            --bg-body: #f4f6f8;       
-            --bg-card: #ffffff;       
-            --text-main: #212529;     
-            --text-muted: #6c757d;    
-            --border: #e9ecef;        
-            
-            --primary: #0d6efd;       
-            --success: #198754;       
-            
-            --map-base: #dee2e6;      
-            --map-hover: #ced4da;
-            --map-visited: #0d6efd;   
+        /* ... existing styles ... */
 
-            --nav-height: 70px;
-        }
-
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            padding-bottom: var(--nav-height);
-        }
-
-        h2 { font-weight: 800; color: var(--text-main); font-size: 1.6rem; letter-spacing: -0.5px; }
-        h5 { font-weight: 700; font-size: 1rem; margin-bottom: 12px;}
-
-        /* CARDS */
-        .nexus-card {
-            background-color: var(--bg-card);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(0,0,0,0.04);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
-        }
-
-        /* MAP */
-        #world-map {
-            width: 100%;
-            height: 340px;
-            background-color: var(--bg-card);
-            border-radius: 16px;
-            overflow: hidden;
-        }
-        
-        /* Custom Tooltip */
-        .jvm-tooltip {
-            background-color: #333;
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-family: sans-serif;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            z-index: 9999;
-        }
-
-        /* STATS */
-        .stat-number { font-size: 2rem; font-weight: 800; color: var(--primary); line-height: 1; }
-        .stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-top: 5px;}
-
-        /* FILTERS */
-        .filter-container { white-space: nowrap; overflow-x: auto; padding-bottom: 4px; }
-        .filter-btn {
-            background: #fff;
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 8px 18px;
-            border-radius: 24px;
-            font-size: 0.85rem;
-            margin-right: 8px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .filter-btn.active {
-            background-color: var(--primary);
-            color: #fff;
-            border-color: var(--primary);
-            box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2);
-        }
-
-        /* TICKTICK TASKS */
+        /* TICKTICK TASKS UPDATED */
         .task-item {
-            display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border);
+            display: flex; align-items: flex-start; /* Align top for multi-line */
+            padding: 12px 0; border-bottom: 1px solid var(--border);
         }
         .task-item:last-child { border-bottom: none; }
-        .task-icon { color: #6c757d; font-size: 1rem; margin-right: 12px; }
-        .task-text { flex-grow: 1; font-weight: 500; font-size: 0.95rem; }
-        .task-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: #e9ecef; color: #6c757d; }
+        .task-icon { color: #6c757d; font-size: 1rem; margin-right: 12px; margin-top: 3px; }
+        .task-content { flex-grow: 1; }
+        .task-text { font-weight: 500; font-size: 0.95rem; line-height: 1.4; }
+        .task-date { font-size: 0.75rem; font-weight: 600; margin-top: 2px; }
+        
+        /* Priority Colors */
+        .prio-high { color: #dc3545; }   /* Red */
+        .prio-med { color: #ffc107; }    /* Yellow */
+        .prio-low { color: #0d6efd; }    /* Blue */
+        .prio-none { color: #adb5bd; }   /* Grey */
 
-        /* JOURNAL LINKS */
-        .journal-item {
-            border-left: 3px solid var(--primary);
-            padding-left: 12px;
-            margin-bottom: 12px;
-            display: block;
-            text-decoration: none;
-            transition: opacity 0.2s;
-        }
-        .journal-item:hover { opacity: 0.7; }
-        .journal-date { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
-        .journal-text { font-size: 0.95rem; color: var(--primary); font-weight: 600; margin-top: 2px; }
+        /* Date Colors */
+        .date-overdue { color: #dc3545; }
+        .date-today { color: #198754; }
+        .date-future { color: #6c757d; }
 
-        /* LISTS */
-        .history-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 14px 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .history-item:last-child { border-bottom: none; }
-        .item-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 2px;}
-        .item-meta { font-size: 0.75rem; color: var(--text-muted); }
-        .item-rating { font-size: 0.75rem; color: #ffc107; }
-
-        /* BADGES */
-        .badge-type { font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .bg-book { background-color: #e7f5ff; color: #007bff; }
-        .bg-movie { background-color: #fff5f5; color: #dc3545; }
-        .bg-music { background-color: #f3f0ff; color: #6f42c1; }
-
-        /* NAV */
-        .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; height: var(--nav-height);
-            background-color: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid var(--border);
-            display: flex; justify-content: space-around; align-items: center;
-            z-index: 1000;
-        }
-        .nav-item {
-            background: none; border: none; flex-grow: 1; text-align: center;
-            color: #adb5bd; font-size: 0.7rem; font-weight: 600; transition: color 0.2s;
-        }
-        .nav-item i { display: block; font-size: 1.5rem; margin-bottom: 4px; }
-        .nav-item.active { color: var(--primary); }
-
-        .tab-content { display: none; padding: 15px; padding-top: 20px; }
-        .tab-content.active { display: block; }
-        .d-none { display: none !important; }
+        /* ... rest of styles ... */
     </style>
 </head>
 <body>
-
-    <!-- === VIEW 1: HQ === -->
-    <div id="view-hq" class="tab-content active">
-        <h2 class="mb-4">Nexus OS</h2>
-        
-        <!-- Google Docs Journal -->
-        <div class="nexus-card">
-            <h5 class="text-primary"><i class="fa-solid fa-file-word me-2"></i>Journal</h5>
-            
-            <div class="input-group mb-3">
-                <input type="text" id="docTitleInput" class="form-control" placeholder="Entry Title (Optional)">
-                <button onclick="createJournalDoc()" class="btn btn-primary fw-bold">
-                    <i class="fa-solid fa-plus me-1"></i> New Doc
-                </button>
-            </div>
-            
-            <div id="journal-feed">
-                <!-- Links Injected Here -->
-                <div class="text-muted small text-center py-2">Loading Docs...</div>
-            </div>
-        </div>
-
-        <!-- TickTick Tasks -->
-        <div class="nexus-card">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0 text-success"><i class="fa-solid fa-check-circle me-2"></i>TickTick</h5>
-                <small class="text-muted" style="font-size: 0.7rem;">SYNCED</small>
-            </div>
-            
-            <div id="task-list">
-                <div class="text-center text-muted small py-3">Syncing TickTick...</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- === VIEW 2: VISA (Backlog) === -->
-    <div id="view-visa" class="tab-content">
-        <h2 class="mb-4">Visa Queue</h2>
-        <div class="nexus-card p-0 px-3" id="backlog-container">
-            <div class="text-center text-muted py-5 small">Loading backlog...</div>
-        </div>
-    </div>
-
-    <!-- === VIEW 3: WORLD (Passport) === -->
-    <div id="view-world" class="tab-content">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="mb-0">Passport</h2>
-            <button class="btn btn-primary btn-sm fw-bold shadow-sm px-3 rounded-pill" onclick="showMovieModal()">
-                <i class="fa-solid fa-plus me-1"></i> Log
-            </button>
-        </div>
-        
-        <div class="d-flex mb-3 filter-container">
-            <button class="filter-btn active" onclick="filterMap('All')">All</button>
-            <button class="filter-btn" onclick="filterMap('Book')">Books</button>
-            <button class="filter-btn" onclick="filterMap('Movie')">Movies</button>
-            <button class="filter-btn" onclick="filterMap('Music')">Music</button>
-        </div>
-
-        <div id="world-map" class="mb-3 shadow-sm"></div>
-
-        <div class="row g-3">
-            <div class="col-6">
-                <div class="nexus-card text-center py-4 mb-0">
-                    <div id="stat-countries" class="stat-number">0</div>
-                    <div class="stat-label">Countries</div>
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="nexus-card text-center py-4 mb-0">
-                    <div id="stat-items" class="stat-number">0</div>
-                    <div class="stat-label">Items</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- === VIEW 4: LOGS === -->
-    <div id="view-history" class="tab-content">
-        <h2 class="mb-3">Travel Logs</h2>
-        <input type="text" id="historySearch" class="form-control mb-3 shadow-sm" placeholder="Search history..." onkeyup="renderHistory()">
-        <div id="history-container" class="nexus-card p-0 px-3 border-0 bg-transparent shadow-none"></div>
-    </div>
-
-    <!-- === NAV === -->
-    <nav class="bottom-nav">
-        <button class="nav-item active" onclick="switchTab('hq')"><i class="fa-solid fa-house"></i>HQ</button>
-        <button class="nav-item" onclick="switchTab('visa')"><i class="fa-solid fa-hourglass-half"></i>Visa</button>
-        <button class="nav-item" onclick="switchTab('world')"><i class="fa-solid fa-earth-americas"></i>World</button>
-        <button class="nav-item" onclick="switchTab('history')"><i class="fa-solid fa-list"></i>Logs</button>
-    </nav>
-
-    <!-- === MODALS === -->
-    <div id="movieModal" class="modal fade" tabindex="-1" data-bs-backdrop="static">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-            <div class="modal-header border-bottom-0 p-4 pb-0">
-              <h5 class="modal-title fw-bold">Add Entry</h5>
-              <button type="button" class="btn-close" onclick="closeModal()"></button>
-            </div>
-            <div class="modal-body p-4">
-              <label class="small text-muted fw-bold mb-1 ms-1">TYPE</label>
-              <select id="mType" class="form-select mb-3">
-                  <option value="Movie" selected>Movie</option>
-                  <option value="Music">Music</option>
-                  <option value="Series">Series</option>
-              </select>
-
-              <label class="small text-muted fw-bold mb-1 ms-1">TITLE</label>
-              <input type="text" id="mTitle" class="form-control mb-3" placeholder="e.g. Inception">
-              
-              <div class="form-check form-switch mb-4 p-3 bg-light rounded" style="margin-left: 0;">
-                  <input class="form-check-input ms-0 me-2" type="checkbox" id="watchedCheck" onchange="toggleRatingFields()">
-                  <label class="form-check-label small fw-bold" for="watchedCheck">I have finished this</label>
-              </div>
-
-              <div id="ratingFields" class="d-none">
-                  <label class="small text-muted fw-bold mb-1 ms-1">RATING</label>
-                  <select id="mRating" class="form-select mb-3">
-                      <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
-                      <option value="4">⭐⭐⭐⭐ Good</option>
-                      <option value="3">⭐⭐⭐ Average</option>
-                      <option value="2">⭐⭐ Poor</option>
-                      <option value="1">⭐ Terrible</option>
-                  </select>
-                  
-                  <label class="small text-muted fw-bold mb-1 ms-1">DATE FINISHED</label>
-                  <input type="date" id="mDate" class="form-control">
-              </div>
-              
-              <button class="btn btn-primary w-100 fw-bold py-3 mt-2 rounded-pill shadow-sm" onclick="handleSave()">Save to Passport</button>
-            </div>
-          </div>
-        </div>
-    </div>
-
-    <div id="countryModal" class="modal fade" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-          <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-            <div class="modal-header border-bottom-0 p-4 pb-0">
-              <h5 class="modal-title fw-bold" id="countryModalTitle">Country</h5>
-              <button type="button" class="btn-close" onclick="closeCountryModal()"></button>
-            </div>
-            <div class="modal-body p-0" id="countryModalBody"></div>
-          </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsvectormap"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/maps/world.js"></script>
+    <!-- ... existing body structure ... -->
 
     <script>
-        // *** IMPORTANT: PASTE YOUR GAS DEPLOYMENT URL HERE ***
-        const API_URL = "https://script.google.com/macros/s/AKfycbzEdsHSoG_yfkB_lMKe7RjQoCvd9d0egA1s7LXtuSz8Se6WLjIHSeNQlK0-xOO9C7yw/exec";
-        
-        let fullData = [];
-        let mapInstance = null;
-        let currentFilter = 'All';
-        
-        let movieModal = null;
-        let countryModal = null;
-
-        // NAVIGATION
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`view-${tabName}`).classList.add('active');
-            event.currentTarget.classList.add('active');
-
-            if(tabName === 'world' && fullData.length === 0) fetchData(); 
-            else if(tabName === 'world') setTimeout(renderMap, 100); 
-            
-            if(tabName === 'hq') loadDashboard();
-        }
+        // ... existing config ...
 
         // --- DASHBOARD (HQ) ---
         function loadDashboard() {
@@ -336,15 +44,41 @@
                 // 1. TickTick Tasks
                 const taskContainer = document.getElementById('task-list');
                 if(!data.tasks || data.tasks.length === 0) {
-                    taskContainer.innerHTML = '<div class="text-center text-muted small py-3">No active tasks in Inbox.</div>';
+                    taskContainer.innerHTML = '<div class="text-center text-muted small py-3">All caught up! No active tasks.</div>';
                 } else {
-                    taskContainer.innerHTML = data.tasks.map(t => `
+                    taskContainer.innerHTML = data.tasks.map(t => {
+                        // Format Date
+                        let dateHtml = "";
+                        if (t.dueDate) {
+                            const dateObj = new Date(t.dueDate);
+                            const now = new Date();
+                            const isToday = dateObj.toDateString() === now.toDateString();
+                            const isOverdue = dateObj < now && !isToday;
+                            
+                            // Formatting
+                            const timeStr = t.isAllDay ? "" : dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                            const dateStr = isToday ? "Today" : dateObj.toLocaleDateString([], {month: 'short', day: 'numeric'});
+                            
+                            const dateClass = isOverdue ? "date-overdue" : (isToday ? "date-today" : "date-future");
+                            dateHtml = `<div class="task-date ${dateClass}">${dateStr} ${timeStr}</div>`;
+                        }
+
+                        // Priority Class (TickTick: 5=High, 3=Med, 1=Low, 0=None) - Mapping varies, usually High=High
+                        // Simplified mapping based on TickTick standard
+                        let prioClass = "prio-none";
+                        if (t.priority === 5) prioClass = "prio-high";
+                        else if (t.priority === 3) prioClass = "prio-med";
+                        else if (t.priority === 1) prioClass = "prio-low";
+
+                        return `
                         <div class="task-item">
-                            <i class="fa-regular fa-circle task-icon"></i>
-                            <div class="task-text">${t.title}</div>
-                            <span class="task-badge">${t.status || 'Active'}</span>
+                            <i class="fa-regular fa-circle task-icon ${prioClass}"></i>
+                            <div class="task-content">
+                                <div class="task-text">${t.title}</div>
+                                ${dateHtml}
+                            </div>
                         </div>
-                    `).join('');
+                    `}).join('');
                 }
 
                 // 2. Google Docs Journal
@@ -362,166 +96,7 @@
             });
         }
 
-        function createJournalDoc() {
-            const titleInput = document.getElementById('docTitleInput');
-            const title = titleInput.value;
-            
-            // UI Feedback
-            const btn = event.target.closest('button');
-            const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
-            btn.disabled = true;
-
-            fetch(`${API_URL}?action=createJournalDoc&title=${encodeURIComponent(title)}`)
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    window.open(data.url, '_blank'); // Open Doc
-                    titleInput.value = "";
-                    loadDashboard(); // Refresh list
-                } else {
-                    alert("Error creating doc");
-                }
-                btn.innerHTML = originalHtml;
-                btn.disabled = false;
-            });
-        }
-
-        // --- PASSPORT DATA ---
-        function fetchData() {
-            fetch(`${API_URL}?action=getPassport`)
-            .then(res => res.json())
-            .then(data => {
-                if (!Array.isArray(data)) return;
-                fullData = data.map(d => ({
-                    ...d,
-                    Rating: (d.Rating === "" || d.Rating === undefined || d.Rating === null) ? 0 : Number(d.Rating)
-                }));
-                renderMap();
-                renderHistory();
-                renderBacklog();
-            });
-        }
-
-        // MAP RENDERING
-        function filterMap(type) {
-            currentFilter = type;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.toggle('active', btn.innerText === type));
-            renderMap();
-        }
-
-        function renderMap() {
-            const activeItems = fullData.filter(d => d.Rating > 0);
-            const filteredData = currentFilter === 'All' ? activeItems : activeItems.filter(d => d.Type.includes(currentFilter));
-
-            const countryStats = {};
-            filteredData.forEach(item => {
-                const code = item.Country_Code;
-                if(!code || code === '??') return;
-                const cleanCode = code.toUpperCase(); 
-                if(!countryStats[cleanCode]) countryStats[cleanCode] = { total: 0, Book: 0, Movie: 0, Music: 0 };
-                countryStats[cleanCode].total++;
-                if (item.Type.includes('Book')) countryStats[cleanCode].Book++;
-                else if (item.Type.includes('Movie')) countryStats[cleanCode].Movie++;
-                else if (item.Type.includes('Music')) countryStats[cleanCode].Music++;
-            });
-
-            document.getElementById('stat-countries').innerText = Object.keys(countryStats).length;
-            document.getElementById('stat-items').innerText = filteredData.length;
-            document.getElementById('world-map').innerHTML = "";
-
-            mapInstance = new jsVectorMap({
-                selector: "#world-map",
-                map: "world",
-                zoomButtons: false,
-                visualizeData: {
-                    scale: ['#dee2e6', '#0d6efd'],
-                    values: Object.keys(countryStats).reduce((acc, code) => ({...acc, [code]: 1}), {})
-                },
-                regionStyle: {
-                    initial: { fill: '#dee2e6' },
-                    hover: { fill: '#ced4da', cursor: 'pointer' },
-                    selected: { fill: '#0d6efd' }
-                },
-                series: { regions: [{ scale: { 1: '#0d6efd' }, attribute: 'fill', values: Object.keys(countryStats).reduce((acc, code) => ({...acc, [code]: 1}), {}) }] },
-                onRegionTooltipShow(event, tooltip, code) {
-                    const c = code.toUpperCase();
-                    const s = countryStats[c];
-                    if(s) {
-                        tooltip.text(`<div class="text-start"><div class="fw-bold mb-1 border-bottom pb-1">${tooltip.text()}</div><div class="d-flex align-items-center justify-content-between mb-1"><span class="small">Total</span><span class="badge bg-warning text-dark rounded-pill">${s.total}</span></div><div class="d-flex gap-2" style="font-size:0.75rem"><span class="text-primary">📘 ${s.Book}</span><span class="text-danger">🎬 ${s.Movie}</span><span class="text-info">🎵 ${s.Music}</span></div></div>`, true);
-                    }
-                },
-                onRegionClick(event, code) { showCountryDetails(code); }
-            });
-        }
-
-        // --- LISTS & MODALS ---
-        function renderHistory() {
-            const query = document.getElementById('historySearch').value.toLowerCase();
-            const completed = fullData.filter(d => d.Rating > 0).reverse();
-            const filtered = completed.filter(d => d.Title && d.Title.toLowerCase().includes(query));
-            const html = filtered.map(d => `<div class="history-item"><div><div class="item-title">${d.Title}</div><div class="item-meta">${d.Creator || "?"} • <span class="fw-bold text-dark">${d.Country_Code}</span></div></div><div class="text-end"><span class="badge-type ${getBadgeClass(d.Type)}">${d.Type}</span><div class="item-rating mt-1">${"★".repeat(Math.round(d.Rating))}</div></div></div>`).join('');
-            document.getElementById('history-container').innerHTML = html || '<div class="text-muted text-center py-4">No history found.</div>';
-        }
-
-        function renderBacklog() {
-            const backlog = fullData.filter(d => d.Rating === 0);
-            const html = backlog.map(d => `<div class="history-item"><div><div class="item-title">${d.Title}</div><div class="item-meta">${d.Creator || "Unknown"}</div></div><span class="badge bg-light text-dark border">In Queue</span></div>`).join('');
-            document.getElementById('backlog-container').innerHTML = html || '<div class="text-center text-muted py-5">Visa queue empty.</div>';
-        }
-
-        function getBadgeClass(type) {
-            if(!type) return "";
-            if(type.includes("Book")) return "bg-book";
-            if(type.includes("Movie")) return "bg-movie";
-            return "bg-music";
-        }
-
-        function showCountryDetails(code) {
-            const cleanCode = code.toUpperCase();
-            const countryItems = fullData.filter(d => d.Country_Code && d.Country_Code.toUpperCase() === cleanCode && d.Rating > 0);
-            const modalBody = document.getElementById('countryModalBody');
-            document.getElementById('countryModalTitle').innerText = `Visa Stamp: ${cleanCode}`;
-            if (countryItems.length === 0) modalBody.innerHTML = '<div class="p-4 text-center text-muted">No finished items yet.</div>';
-            else modalBody.innerHTML = countryItems.map(d => `<div class="d-flex justify-content-between align-items-center p-3 border-bottom"><div><div class="fw-bold">${d.Title}</div><div class="small text-muted">${d.Creator || "Unknown"}</div></div><span class="badge-type ${getBadgeClass(d.Type)}">${d.Type}</span></div>`).join('');
-            if (!countryModal) countryModal = new bootstrap.Modal(document.getElementById('countryModal'));
-            countryModal.show();
-        }
-        function closeCountryModal() { if(countryModal) countryModal.hide(); }
-
-        // --- SAVE LOGIC ---
-        function showMovieModal() {
-            const el = document.getElementById('movieModal');
-            if(!movieModal) movieModal = new bootstrap.Modal(el);
-            movieModal.show();
-            document.getElementById('mTitle').value = "";
-            document.getElementById('mType').value = "Movie";
-            document.getElementById('watchedCheck').checked = false;
-            document.getElementById('ratingFields').classList.add('d-none');
-            document.getElementById('mDate').valueAsDate = new Date();
-        }
-        function closeModal() { if(movieModal) movieModal.hide(); }
-        function toggleRatingFields() {
-            const isWatched = document.getElementById('watchedCheck').checked;
-            document.getElementById('ratingFields').classList.toggle('d-none', !isWatched);
-        }
-        function handleSave() {
-            const title = document.getElementById('mTitle').value;
-            const type = document.getElementById('mType').value;
-            const isWatched = document.getElementById('watchedCheck').checked;
-            if(!title) { alert("Title required"); return; }
-            const rating = isWatched ? document.getElementById('mRating').value : 0;
-            const status = isWatched ? 'watched' : 'watchlist';
-            const date = isWatched ? document.getElementById('mDate').value : "";
-            fullData.push({ Title: title, Creator: "Unknown", Type: type, Country_Code: "??", Rating: Number(rating) });
-            renderMap(); renderHistory(); renderBacklog();
-            closeModal();
-            fetch(`${API_URL}?action=logMovie&title=${encodeURIComponent(title)}&type=${type}&rating=${rating}&status=${status}&date=${date}`);
-        }
-
-        // INIT
-        loadDashboard();
-        fetchData();
+        // ... rest of script ...
     </script>
 </body>
 </html>
