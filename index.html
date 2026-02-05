@@ -58,6 +58,16 @@
             overflow: hidden;
             /* Removes border for cleaner look */
         }
+        
+        /* Custom Tooltip Styling */
+        .jvm-tooltip {
+            background-color: #333;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 9999;
+        }
 
         /* STATS */
         .stat-number { font-size: 2rem; font-weight: 800; color: var(--primary); line-height: 1; }
@@ -206,7 +216,7 @@
     </nav>
 
     <!-- === MODAL: LOG ENTRY === -->
-    <div id="movieModal" class="modal fade" tabindex="-1">
+    <div id="movieModal" class="modal fade" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
             <div class="modal-header border-bottom-0 p-4 pb-0">
@@ -214,6 +224,13 @@
               <button type="button" class="btn-close" onclick="closeModal()"></button>
             </div>
             <div class="modal-body p-4">
+              <label class="small text-muted fw-bold mb-1 ms-1">TYPE</label>
+              <select id="mType" class="form-select mb-3">
+                  <option value="Movie" selected>Movie</option>
+                  <option value="Book">Book</option>
+                  <option value="Music">Music</option>
+              </select>
+
               <label class="small text-muted fw-bold mb-1 ms-1">TITLE</label>
               <input type="text" id="mTitle" class="form-control mb-3" placeholder="e.g. Inception">
               
@@ -248,7 +265,7 @@
           <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
             <div class="modal-header border-bottom-0 p-4 pb-0">
               <h5 class="modal-title fw-bold" id="countryModalTitle">Country</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              <button type="button" class="btn-close" onclick="closeCountryModal()"></button>
             </div>
             <div class="modal-body p-0" id="countryModalBody">
                 <!-- Items injected here -->
@@ -269,6 +286,10 @@
         let fullData = [];
         let mapInstance = null;
         let currentFilter = 'All';
+        
+        // Modal Instances
+        let movieModal = null;
+        let countryModal = null;
 
         // NAVIGATION
         function switchTab(tabName) {
@@ -320,13 +341,22 @@
             const activeItems = fullData.filter(d => d.Rating > 0);
             const filteredData = currentFilter === 'All' ? activeItems : activeItems.filter(d => d.Type.includes(currentFilter));
 
+            // Calculate Detailed Stats
             const countryStats = {};
             filteredData.forEach(item => {
                 const code = item.Country_Code;
                 if(!code || code === '??') return;
-                const cleanCode = code.toUpperCase(); // Ensure case matching
-                if(!countryStats[cleanCode]) countryStats[cleanCode] = 0;
-                countryStats[cleanCode]++;
+                const cleanCode = code.toUpperCase(); 
+                
+                if(!countryStats[cleanCode]) {
+                    countryStats[cleanCode] = { total: 0, Book: 0, Movie: 0, Music: 0 };
+                }
+                countryStats[cleanCode].total++;
+                
+                // Count types
+                if (item.Type.includes('Book')) countryStats[cleanCode].Book++;
+                else if (item.Type.includes('Movie')) countryStats[cleanCode].Movie++;
+                else if (item.Type.includes('Music')) countryStats[cleanCode].Music++;
             });
 
             document.getElementById('stat-countries').innerText = Object.keys(countryStats).length;
@@ -353,6 +383,28 @@
                         attribute: 'fill',
                         values: Object.keys(countryStats).reduce((acc, code) => ({...acc, [code]: 1}), {})
                     }]
+                },
+                // HOVER TOOLTIP LOGIC
+                onRegionTooltipShow(event, tooltip, code) {
+                    const c = code.toUpperCase();
+                    const s = countryStats[c];
+                    if(s) {
+                        tooltip.text(
+                            `<div class="text-start">
+                               <div class="fw-bold mb-1 border-bottom pb-1">${tooltip.text()}</div>
+                               <div class="d-flex align-items-center justify-content-between mb-1">
+                                 <span class="small">Total</span>
+                                 <span class="badge bg-warning text-dark rounded-pill">${s.total}</span>
+                               </div>
+                               <div class="d-flex gap-2" style="font-size:0.75rem">
+                                 <span class="text-primary">📘 ${s.Book}</span>
+                                 <span class="text-danger">🎬 ${s.Movie}</span>
+                                 <span class="text-info">🎵 ${s.Music}</span>
+                               </div>
+                             </div>`,
+                            true // Allow HTML
+                        );
+                    }
                 },
                 // CLICK INTERACTION
                 onRegionClick(event, code) {
@@ -385,7 +437,14 @@
                 modalBody.innerHTML = html;
             }
             
-            new bootstrap.Modal(document.getElementById('countryModal')).show();
+            // USE GLOBAL INSTANCE TO PREVENT STUCK OVERLAY
+            const el = document.getElementById('countryModal');
+            if (!countryModal) countryModal = new bootstrap.Modal(el);
+            countryModal.show();
+        }
+        
+        function closeCountryModal() {
+            if(countryModal) countryModal.hide();
         }
 
         // HISTORY LIST
@@ -434,11 +493,14 @@
         }
 
         // MODAL & SAVE
-        let modalInstance = null;
         function showMovieModal() {
-            modalInstance = new bootstrap.Modal(document.getElementById('movieModal'));
-            modalInstance.show();
+            const el = document.getElementById('movieModal');
+            if(!movieModal) movieModal = new bootstrap.Modal(el);
+            
+            movieModal.show();
+            // Reset fields
             document.getElementById('mTitle').value = "";
+            document.getElementById('mType').value = "Movie"; // Default to Movie
             document.getElementById('watchedCheck').checked = false;
             document.getElementById('ratingFields').classList.add('d-none');
             document.getElementById('mDate').valueAsDate = new Date();
@@ -451,10 +513,11 @@
             else fields.classList.add('d-none');
         }
 
-        function closeModal() { if(modalInstance) modalInstance.hide(); }
+        function closeModal() { if(movieModal) movieModal.hide(); }
 
         function handleSave() {
             const title = document.getElementById('mTitle').value;
+            const type = document.getElementById('mType').value;
             const isWatched = document.getElementById('watchedCheck').checked;
             
             if(!title) { alert("Title required"); return; }
@@ -464,11 +527,11 @@
             const date = isWatched ? document.getElementById('mDate').value : "";
 
             // Optimistic UI
-            fullData.push({ Title: title, Creator: "Unknown", Type: "Movie", Country_Code: "??", Rating: Number(rating) });
+            fullData.push({ Title: title, Creator: "Unknown", Type: type, Country_Code: "??", Rating: Number(rating) });
             renderMap(); renderHistory(); renderBacklog();
             closeModal();
 
-            fetch(`${API_URL}?action=logMovie&title=${encodeURIComponent(title)}&rating=${rating}&status=${status}&date=${date}`)
+            fetch(`${API_URL}?action=logMovie&title=${encodeURIComponent(title)}&type=${type}&rating=${rating}&status=${status}&date=${date}`)
             .then(res => res.json())
             .then(d => {
                 // Confirm save success if needed, or handle error
