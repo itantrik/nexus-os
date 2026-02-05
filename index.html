@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nexus OS 3.0</title>
+    <title>Nexus OS</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,40 +11,56 @@
 
     <style>
         :root {
-            /* REFINED PALETTE (Grey/Green Theme) */
-            --bg-dark: #121212;
-            --bg-card: #1e1e1e;
-            --text-main: #e0e0e0;
-            --text-muted: #a0a0a0;
-            --border: #333;
+            /* CLEAN LIGHT THEME */
+            --bg-body: #f0f2f5;       /* Light Grey Background */
+            --bg-card: #ffffff;       /* White Cards */
+            --text-main: #1c1e21;     /* Dark Text */
+            --text-muted: #65676b;    /* Grey Text */
+            --border: #e4e6eb;        /* Subtle Border */
             
-            --accent: #27ae60; /* Green for Visited/Active */
-            --map-base: #2c3e50; /* Subtle Grey-Blue for Map Base */
+            --primary: #0d6efd;       /* Bootstrap Blue */
+            --success: #198754;       /* Green */
             
+            --map-base: #e4e6eb;      /* Light Map Background */
+            --map-hover: #d8dadf;
+            --map-visited: #0d6efd;   /* Visited Country Color */
+
             --nav-height: 65px;
-            
-            /* TYPE BADGE COLORS */
-            --col-book: #3498db; /* Blue */
-            --col-movie: #e74c3c; /* Red */
-            --col-music: #f1c40f; /* Yellow */
         }
-        
+
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--bg-body);
             color: var(--text-main);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             padding-bottom: var(--nav-height);
         }
 
+        h2, h5 { font-weight: 700; color: var(--text-main); }
+        h2 { font-size: 1.5rem; }
+
+        /* CARDS */
         .nexus-card {
             background-color: var(--bg-card);
             border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
             border: 1px solid var(--border);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Soft Shadow */
         }
 
-        /* MAP STYLING */
+        /* INPUTS */
+        .form-control, .form-select {
+            background-color: #f0f2f5;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 8px;
+        }
+        .form-control:focus {
+            background-color: #fff;
+            box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+        }
+
+        /* MAP */
         #world-map {
             width: 100%;
             height: 320px;
@@ -53,39 +69,62 @@
             border: 1px solid var(--border);
         }
 
-        /* HISTORY ITEMS */
+        /* STATS */
+        .stat-number { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* FILTERS */
+        .filter-btn {
+            background: #fff;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-right: 6px;
+            font-weight: 500;
+        }
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(13, 110, 253, 0.3);
+        }
+
+        /* HISTORY LIST */
         .history-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 0; border-bottom: 1px solid #333;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
         }
         .history-item:last-child { border-bottom: none; }
-        
-        .type-badge { font-size: 10px; padding: 3px 6px; border-radius: 4px; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; }
-        .type-book { color: var(--col-book); border: 1px solid var(--col-book); }
-        .type-movie { color: var(--col-movie); border: 1px solid var(--col-movie); }
-        .type-music { color: var(--col-music); border: 1px solid var(--col-music); }
+        .item-title { font-weight: 600; font-size: 0.95rem; }
+        .item-meta { font-size: 0.8rem; color: var(--text-muted); }
 
-        /* FILTER BUTTONS */
-        .filter-btn {
-            border: 1px solid var(--border); background: var(--bg-card); color: var(--text-muted);
-            font-size: 13px; padding: 6px 14px; border-radius: 20px; margin-right: 5px;
-        }
-        .filter-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+        /* TYPE BADGES */
+        .badge-type { font-size: 0.7rem; font-weight: 700; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
+        .bg-book { background-color: #e7f5ff; color: #007bff; }
+        .bg-movie { background-color: #fff5f5; color: #dc3545; }
+        .bg-music { background-color: #f3f0ff; color: #6f42c1; }
 
         /* NAV */
         .bottom-nav {
             position: fixed; bottom: 0; width: 100%; height: var(--nav-height);
-            background-color: #181818; border-top: 1px solid var(--border);
-            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+            background-color: #ffffff;
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around; align-items: center;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
         }
-        .nav-item { color: #666; font-size: 11px; background: none; border: none; flex-grow: 1; text-align: center;}
-        .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
-        .nav-item.active { color: var(--accent); }
+        .nav-item {
+            background: none; border: none; flex-grow: 1; text-align: center;
+            color: #b0b3b8; font-size: 0.7rem; font-weight: 500;
+        }
+        .nav-item i { display: block; font-size: 1.4rem; margin-bottom: 4px; }
+        .nav-item.active { color: var(--primary); }
 
         .tab-content { display: none; padding: 15px; }
         .tab-content.active { display: block; }
-        
-        /* HIDDEN ELEMENTS FOR TOGGLE */
         .d-none { display: none !important; }
     </style>
 </head>
@@ -93,29 +132,34 @@
 
     <div id="view-hq" class="tab-content active">
         <h2 class="mb-4">Nexus OS</h2>
+        
         <div class="nexus-card">
+            <h5 class="mb-3">Quick Journal</h5>
             <div class="input-group">
-                <input type="text" id="journalInput" class="form-control bg-dark text-white border-secondary" placeholder="Log a thought...">
-                <button onclick="logJournal()" class="btn btn-secondary"><i class="fa-solid fa-paper-plane"></i></button>
+                <input type="text" id="journalInput" class="form-control" placeholder="Write something...">
+                <button onclick="logJournal()" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
+
         <div class="nexus-card">
-            <h5 class="text-white mb-3"><i class="fa-solid fa-check-circle me-2 text-success"></i>Tasks</h5>
-            <div id="task-list"><div class="text-center text-muted">Loading...</div></div>
+            <h5 class="mb-3">Tasks</h5>
+            <div id="task-list">
+                <div class="text-center text-muted small py-3">Loading tasks...</div>
+            </div>
         </div>
     </div>
 
     <div id="view-visa" class="tab-content">
-        <h2 class="mb-4">Visa in Process</h2>
-        <div class="nexus-card p-0 border-0" id="backlog-container">
-            <div class="text-center text-muted p-4">Loading Visa...</div>
+        <h2 class="mb-4">Visa Queue</h2>
+        <div class="nexus-card p-0" id="backlog-container">
+            <div class="text-center text-muted py-5 small">Loading backlog...</div>
         </div>
     </div>
 
     <div id="view-world" class="tab-content">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="mb-0">Passport</h2>
-            <button class="btn btn-outline-success btn-sm" onclick="showMovieModal()">
+            <button class="btn btn-primary btn-sm fw-bold shadow-sm" onclick="showMovieModal()">
                 <i class="fa-solid fa-plus"></i> Add Entry
             </button>
         </div>
@@ -127,19 +171,19 @@
             <button class="filter-btn" onclick="filterMap('Music')">Music</button>
         </div>
 
-        <div id="world-map" class="mb-3"></div>
+        <div id="world-map" class="mb-3 shadow-sm"></div>
 
-        <div class="row g-2">
+        <div class="row g-3">
             <div class="col-6">
-                <div class="nexus-card text-center p-2">
-                    <h3 id="stat-countries" class="text-white mb-0">0</h3>
-                    <small class="text-muted" style="font-size: 11px">Countries</small>
+                <div class="nexus-card text-center py-3 mb-0">
+                    <div id="stat-countries" class="stat-number">0</div>
+                    <div class="stat-label">Countries</div>
                 </div>
             </div>
             <div class="col-6">
-                <div class="nexus-card text-center p-2">
-                    <h3 id="stat-items" class="text-white mb-0">0</h3>
-                    <small class="text-muted" style="font-size: 11px">Items</small>
+                <div class="nexus-card text-center py-3 mb-0">
+                    <div id="stat-items" class="stat-number">0</div>
+                    <div class="stat-label">Items</div>
                 </div>
             </div>
         </div>
@@ -147,8 +191,8 @@
 
     <div id="view-history" class="tab-content">
         <h2 class="mb-3">Travel Logs</h2>
-        <input type="text" id="historySearch" class="form-control bg-dark text-white border-secondary mb-3" placeholder="Search..." onkeyup="renderHistory()">
-        <div id="history-container"></div>
+        <input type="text" id="historySearch" class="form-control mb-3 shadow-sm" placeholder="Search history..." onkeyup="renderHistory()">
+        <div id="history-container" class="nexus-card p-0 border-0 bg-transparent shadow-none"></div>
     </div>
 
     <nav class="bottom-nav">
@@ -160,32 +204,36 @@
 
     <div id="movieModal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content bg-dark border-secondary">
-            <div class="modal-header border-secondary">
-              <h5 class="text-white">Log Entry</h5>
-              <button type="button" class="btn-close btn-close-white" onclick="closeModal()"></button>
+          <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom-0">
+              <h5 class="modal-title fw-bold">Log Entry</h5>
+              <button type="button" class="btn-close" onclick="closeModal()"></button>
             </div>
-            <div class="modal-body">
-              <input type="text" id="mTitle" class="form-control bg-black text-white mb-3 border-secondary" placeholder="Title (e.g. Inception)">
+            <div class="modal-body pt-0">
+              <label class="small text-muted fw-bold mb-1">TITLE</label>
+              <input type="text" id="mTitle" class="form-control mb-3" placeholder="e.g. Inception">
               
-              <div class="form-check form-switch mb-3">
+              <div class="form-check form-switch mb-3 p-3 bg-light rounded">
                   <input class="form-check-input" type="checkbox" id="watchedCheck" onchange="toggleRatingFields()">
-                  <label class="form-check-label text-white" for="watchedCheck">I have already watched/read this</label>
+                  <label class="form-check-label small fw-bold" for="watchedCheck">I have finished this</label>
               </div>
 
               <div id="ratingFields" class="d-none">
-                  <select id="mRating" class="form-control bg-black text-white mb-2 border-secondary">
-                      <option value="5">⭐⭐⭐⭐⭐ (5)</option>
-                      <option value="4">⭐⭐⭐⭐ (4)</option>
-                      <option value="3">⭐⭐⭐ (3)</option>
-                      <option value="2">⭐⭐ (2)</option>
-                      <option value="1">⭐ (1)</option>
+                  <label class="small text-muted fw-bold mb-1">RATING</label>
+                  <select id="mRating" class="form-select mb-3">
+                      <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                      <option value="4">⭐⭐⭐⭐ Good</option>
+                      <option value="3">⭐⭐⭐ Average</option>
+                      <option value="2">⭐⭐ Poor</option>
+                      <option value="1">⭐ Terrible</option>
                   </select>
-                  <input type="date" id="mDate" class="form-control bg-black text-white border-secondary">
+                  
+                  <label class="small text-muted fw-bold mb-1">DATE FINISHED</label>
+                  <input type="date" id="mDate" class="form-control">
               </div>
             </div>
-            <div class="modal-footer border-secondary">
-              <button class="btn btn-success w-100" onclick="handleSave()">Save Entry</button>
+            <div class="modal-footer border-top-0">
+              <button class="btn btn-primary w-100 fw-bold py-2" onclick="handleSave()">Save Entry</button>
             </div>
           </div>
         </div>
@@ -196,13 +244,14 @@
     <script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/maps/world.js"></script>
 
     <script>
+        // *** IMPORTANT: PASTE YOUR GAS DEPLOYMENT URL HERE ***
         const API_URL = "https://script.google.com/macros/s/AKfycbzEdsHSoG_yfkB_lMKe7RjQoCvd9d0egA1s7LXtuSz8Se6WLjIHSeNQlK0-xOO9C7yw/exec";
         
         let fullData = [];
         let mapInstance = null;
         let currentFilter = 'All';
 
-        // --- NAVIGATION ---
+        // NAVIGATION
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -213,15 +262,15 @@
             else if(tabName === 'world') setTimeout(renderMap, 100); 
         }
 
-        // --- DATA ENGINE ---
+        // DATA FETCHING & CLEANING
         function fetchData() {
             fetch(`${API_URL}?action=getPassport`)
             .then(res => res.json())
             .then(data => {
-                // CLEAN DATA: Ensure Ratings are Numbers
+                // FORCE RATINGS TO NUMBERS
                 fullData = data.map(d => ({
                     ...d,
-                    Rating: (d.Rating === "" || d.Rating === undefined) ? 0 : Number(d.Rating)
+                    Rating: (d.Rating === "" || d.Rating === undefined || d.Rating === null) ? 0 : Number(d.Rating)
                 }));
                 
                 renderMap();
@@ -230,7 +279,7 @@
             });
         }
 
-        // --- MAP LOGIC (Green/Grey) ---
+        // MAP RENDERING
         function filterMap(type) {
             currentFilter = type;
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.toggle('active', btn.innerText === type));
@@ -238,11 +287,9 @@
         }
 
         function renderMap() {
-            // Filter: Only Completed Items (Rating > 0)
             const activeItems = fullData.filter(d => d.Rating > 0);
             const filteredData = currentFilter === 'All' ? activeItems : activeItems.filter(d => d.Type.includes(currentFilter));
 
-            // Aggregate Data
             const countryStats = {};
             filteredData.forEach(item => {
                 const code = item.Country_Code;
@@ -261,17 +308,17 @@
                 map: "world",
                 zoomButtons: false,
                 visualizeData: {
-                    scale: ['#2c3e50', '#27ae60'], // Grey to Green
+                    scale: ['#e4e6eb', '#0d6efd'], // Light Grey to Blue
                     values: Object.keys(countryStats).reduce((acc, code) => ({...acc, [code]: 1}), {})
                 },
                 regionStyle: {
-                    initial: { fill: '#343a40' }, // Dark Grey base
-                    hover: { fill: '#495057' },
-                    selected: { fill: '#27ae60' } // Green
+                    initial: { fill: '#e4e6eb' }, // Base Color
+                    hover: { fill: '#d8dadf' },
+                    selected: { fill: '#0d6efd' } // Visited Color
                 },
                 series: {
                     regions: [{
-                        scale: { 1: '#27ae60' }, // Force Green
+                        scale: { 1: '#0d6efd' }, // Force Blue
                         attribute: 'fill',
                         values: Object.keys(countryStats).reduce((acc, code) => ({...acc, [code]: 1}), {})
                     }]
@@ -279,56 +326,53 @@
             });
         }
 
-        // --- HISTORY (Logs) ---
+        // HISTORY LIST
         function renderHistory() {
             const query = document.getElementById('historySearch').value.toLowerCase();
-            const completed = fullData.filter(d => d.Rating > 0).reverse(); // Rating > 0 means done
+            const completed = fullData.filter(d => d.Rating > 0).reverse();
             const filtered = completed.filter(d => d.Title.toLowerCase().includes(query));
 
             const html = filtered.map(d => `
-                <div class="history-item">
+                <div class="history-item bg-white px-3 mb-2 rounded border">
                     <div>
-                        <div class="fw-bold text-white">${d.Title}</div>
-                        <div class="small text-muted">${d.Creator || "?"} • ${d.Country_Code}</div>
+                        <div class="item-title">${d.Title}</div>
+                        <div class="item-meta">${d.Creator || "?"} • ${d.Country_Code}</div>
                     </div>
                     <div class="text-end">
-                        <span class="type-badge ${getTypeClass(d.Type)}">${d.Type}</span>
+                        <span class="badge-type ${getBadgeClass(d.Type)}">${d.Type}</span>
                         <div class="text-warning small mt-1">${"★".repeat(Math.round(d.Rating))}</div>
                     </div>
                 </div>
             `).join('');
-            document.getElementById('history-container').innerHTML = html || '<div class="text-muted text-center mt-3">No history found.</div>';
+            document.getElementById('history-container').innerHTML = html || '<div class="text-muted text-center py-4">No history found.</div>';
         }
 
-        // --- BACKLOG (Visa) ---
+        // BACKLOG (VISA)
         function renderBacklog() {
-            // Rating 0 means backlog
             const backlog = fullData.filter(d => d.Rating === 0);
-            
             const html = backlog.map(d => `
-                <div class="history-item">
+                <div class="history-item bg-white px-3 mb-2 rounded border">
                     <div>
-                        <div class="fw-bold text-white">${d.Title}</div>
-                        <div class="small text-muted">${d.Creator || "Unknown"}</div>
+                        <div class="item-title">${d.Title}</div>
+                        <div class="item-meta">${d.Creator || "Unknown"}</div>
                     </div>
-                    <span class="badge bg-secondary">In Queue</span>
+                    <span class="badge bg-light text-dark border">In Queue</span>
                 </div>
             `).join('');
-            document.getElementById('backlog-container').innerHTML = html || '<div class="text-muted text-center mt-5">Visa queue empty.</div>';
+            document.getElementById('backlog-container').innerHTML = html || '<div class="text-center text-muted py-5">Visa queue empty.</div>';
         }
 
-        function getTypeClass(type) {
-            if(type.includes("Book")) return "type-book";
-            if(type.includes("Movie")) return "type-movie";
-            return "type-music";
+        function getBadgeClass(type) {
+            if(type.includes("Book")) return "bg-book";
+            if(type.includes("Movie")) return "bg-movie";
+            return "bg-music";
         }
 
-        // --- NEW MODAL LOGIC ---
+        // MODAL & SAVE
         let modalInstance = null;
         function showMovieModal() {
             modalInstance = new bootstrap.Modal(document.getElementById('movieModal'));
             modalInstance.show();
-            // Reset fields
             document.getElementById('mTitle').value = "";
             document.getElementById('watchedCheck').checked = false;
             document.getElementById('ratingFields').classList.add('d-none');
@@ -350,7 +394,6 @@
             
             if(!title) { alert("Title required"); return; }
             
-            // If Watched: Rating is user value. If Watchlist: Rating is 0.
             const rating = isWatched ? document.getElementById('mRating').value : 0;
             const status = isWatched ? 'watched' : 'watchlist';
             const date = isWatched ? document.getElementById('mDate').value : "";
@@ -360,9 +403,7 @@
             renderMap(); renderHistory(); renderBacklog();
             closeModal();
 
-            // API Call
-            fetch(`${API_URL}?action=logMovie&title=${encodeURIComponent(title)}&rating=${rating}&status=${status}&date=${date}`)
-            .then(res => res.json());
+            fetch(`${API_URL}?action=logMovie&title=${encodeURIComponent(title)}&rating=${rating}&status=${status}&date=${date}`);
         }
 
         function logJournal() {
@@ -373,7 +414,7 @@
             alert("Journal Logged");
         }
 
-        // INIT
+        // START
         fetchData();
     </script>
 </body>
