@@ -1,1 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nexus OS</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap/dist/css/jsvectormap.min.css" />
 
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --text-main: #e0e0e0;
+            --accent: #FFD700; /* Gold for Passport */
+            --nav-height: 60px;
+        }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            padding-bottom: var(--nav-height); /* Space for bottom nav */
+        }
+
+        /* CARD STYLING */
+        .nexus-card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+        }
+
+        /* BOTTOM NAVIGATION */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: var(--nav-height);
+            background-color: #1a1a1a;
+            border-top: 1px solid #333;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            color: #666;
+            text-align: center;
+            font-size: 12px;
+            background: none;
+            border: none;
+            flex-grow: 1;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .nav-item.active {
+            color: var(--accent);
+        }
+
+        /* MAP STYLING */
+        #world-map {
+            width: 100%;
+            height: 300px;
+            background-color: var(--bg-card);
+            border-radius: 12px;
+        }
+
+        /* UTILS */
+        .tab-content { display: none; padding: 20px; }
+        .tab-content.active { display: block; }
+        .badge-country { background-color: #333; color: var(--accent); border: 1px solid var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div id="view-hq" class="tab-content active">
+        <h2 class="mb-4">Good Morning, Saurabh</h2>
+        
+        <div class="nexus-card">
+            <input type="text" id="journalInput" class="form-control bg-dark text-white border-secondary mb-2" placeholder="What's on your mind?">
+            <button onclick="logJournal()" class="btn btn-sm btn-outline-warning w-100">Log to Daily</button>
+        </div>
+
+        <div class="nexus-card">
+            <h5 class="text-secondary mb-3"><i class="fa-solid fa-check-circle me-2"></i>Priority Tasks</h5>
+            <div id="task-list">
+                <div class="text-center text-muted">Loading tasks...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-brain" class="tab-content">
+        <h2 class="mb-4">Knowledge Base</h2>
+        <div class="nexus-card">
+            <input type="text" class="form-control bg-dark text-white border-secondary" placeholder="Search your brain...">
+        </div>
+        <div class="nexus-card">
+            <h5>Active Projects</h5>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-transparent text-white border-secondary">
+                    <a href="#" class="text-decoration-none text-white">Project Revolut</a>
+                </li>
+                <li class="list-group-item bg-transparent text-white border-secondary">
+                    <a href="#" class="text-decoration-none text-white">Househelp App Specs</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="view-world" class="tab-content">
+        <h2 class="mb-4">Cultural Passport</h2>
+        
+        <div class="nexus-card p-0 overflow-hidden">
+            <div id="world-map"></div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-6">
+                <div class="nexus-card text-center">
+                    <h3 id="country-count" class="text-warning mb-0">0</h3>
+                    <small class="text-muted">Countries</small>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="nexus-card text-center">
+                    <h3 id="book-count" class="text-warning mb-0">0</h3>
+                    <small class="text-muted">Books/Music</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('hq')">
+            <i class="fa-solid fa-layer-group"></i> HQ
+        </button>
+        <button class="nav-item" onclick="switchTab('brain')">
+            <i class="fa-solid fa-brain"></i> Brain
+        </button>
+        <button class="nav-item" onclick="switchTab('world')">
+            <i class="fa-solid fa-earth-americas"></i> World
+        </button>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsvectormap"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/maps/world.js"></script>
+
+    <script>
+        // --- CONFIGURATION ---
+        const API_URL = "https://script.google.com/macros/s/AKfycbzEdsHSoG_yfkB_lMKe7RjQoCvd9d0egA1s7LXtuSz8Se6WLjIHSeNQlK0-xOO9C7yw/exec"; // PASTE YOUR URL HERE
+
+        // --- NAVIGATION LOGIC ---
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            // Show selected
+            document.getElementById(`view-${tabName}`).classList.add('active');
+            event.currentTarget.classList.add('active');
+
+            // Load Map if World tab is clicked
+            if(tabName === 'world') loadMapData();
+        }
+
+        // --- API: LOG JOURNAL ---
+        function logJournal() {
+            const text = document.getElementById('journalInput').value;
+            if(!text) return;
+            
+            fetch(`${API_URL}?action=logJournal&text=${encodeURIComponent(text)}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('journalInput').value = "";
+                    alert("Logged to Nexus!");
+                });
+        }
+
+        // --- API: LOAD PASSPORT DATA ---
+        let mapInstance = null;
+
+        function loadMapData() {
+            if(mapInstance) return; // Don't reload if already loaded
+
+            fetch(`${API_URL}?action=getPassport`)
+            .then(res => res.json())
+            .then(data => {
+                // 1. Process Data for Map (Get unique country codes)
+                const visitedCountries = [...new Set(data.map(item => item.Country_Code))];
+                
+                // 2. Update Stats
+                document.getElementById('country-count').innerText = visitedCountries.length;
+                document.getElementById('book-count').innerText = data.length;
+
+                // 3. Initialize Map
+                mapInstance = new jsVectorMap({
+                    selector: "#world-map",
+                    map: "world",
+                    zoomButtons: false,
+                    visualizeData: {
+                        scale: ['#333', '#FFD700'], // Dark to Gold
+                        values: visitedCountries.reduce((acc, code) => ({...acc, [code]: 1}), {})
+                    },
+                    regionStyle: {
+                        initial: { fill: '#2a2a2a' },
+                        hover: { fill: '#444' }
+                    },
+                    series: {
+                        regions: [{
+                            attribute: 'fill',
+                            legend: { title: 'Visited' },
+                            scale: { 1: '#FFD700' }, // Highlight color
+                            values: visitedCountries.reduce((acc, code) => ({...acc, [code]: 1}), {})
+                        }]
+                    }
+                });
+            });
+        }
+        
+        // --- INIT ---
+        // Load Tasks on startup
+        fetch(`${API_URL}?action=getDashboard`)
+            .then(res => res.json())
+            .then(data => {
+                const list = document.getElementById('task-list');
+                list.innerHTML = data.tasks.map(t => 
+                    `<div class="d-flex justify-content-between border-bottom border-secondary py-2">
+                        <span>${t.title}</span>
+                        <small class="text-warning">${t.time}</small>
+                    </div>`
+                ).join('');
+            });
+
+    </script>
+</body>
+</html>
