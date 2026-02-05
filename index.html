@@ -209,11 +209,11 @@
     <div id="movieModal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-            <div class="modal-header border-bottom-0 pb-0">
-              <h5 class="modal-title fw-bold ms-2">Add Entry</h5>
+            <div class="modal-header border-bottom-0 p-4 pb-0">
+              <h5 class="modal-title fw-bold">Add Entry</h5>
               <button type="button" class="btn-close" onclick="closeModal()"></button>
             </div>
-            <div class="modal-body pt-3 pb-4">
+            <div class="modal-body p-4">
               <label class="small text-muted fw-bold mb-1 ms-1">TITLE</label>
               <input type="text" id="mTitle" class="form-control mb-3" placeholder="e.g. Inception">
               
@@ -246,7 +246,7 @@
     <div id="countryModal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
           <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-            <div class="modal-header border-bottom-0">
+            <div class="modal-header border-bottom-0 p-4 pb-0">
               <h5 class="modal-title fw-bold" id="countryModalTitle">Country</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -284,8 +284,13 @@
         // DATA FETCHING & CLEANING
         function fetchData() {
             fetch(`${API_URL}?action=getPassport`)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error("Network response was not ok");
+                return res.json();
+            })
             .then(data => {
+                if (!Array.isArray(data)) throw new Error("API returned invalid format (not an array)");
+
                 // Ensure correct field names matching Google Sheet Headers
                 // Headers are: Title, Creator, Type, Country_Code, Date_Finished, Rating
                 fullData = data.map(d => ({
@@ -297,7 +302,11 @@
                 renderHistory();
                 renderBacklog();
             })
-            .catch(e => console.error("Fetch Error:", e));
+            .catch(e => {
+                console.error("Fetch Error:", e);
+                // alert("Error loading data. Check console for details. Ensure your Google Script is deployed as 'Anyone'.");
+                document.getElementById('task-list').innerHTML = `<div class="text-center text-danger p-3">Error loading data. Check API Permissions.</div>`;
+            });
         }
 
         // MAP RENDERING
@@ -315,8 +324,9 @@
             filteredData.forEach(item => {
                 const code = item.Country_Code;
                 if(!code || code === '??') return;
-                if(!countryStats[code]) countryStats[code] = 0;
-                countryStats[code]++;
+                const cleanCode = code.toUpperCase(); // Ensure case matching
+                if(!countryStats[cleanCode]) countryStats[cleanCode] = 0;
+                countryStats[cleanCode]++;
             });
 
             document.getElementById('stat-countries').innerText = Object.keys(countryStats).length;
@@ -353,11 +363,12 @@
 
         // CLICK HANDLER: Show Country Modal
         function showCountryDetails(code) {
-            const countryItems = fullData.filter(d => d.Country_Code === code && d.Rating > 0);
+            const cleanCode = code.toUpperCase();
+            const countryItems = fullData.filter(d => d.Country_Code && d.Country_Code.toUpperCase() === cleanCode && d.Rating > 0);
             const modalTitle = document.getElementById('countryModalTitle');
             const modalBody = document.getElementById('countryModalBody');
             
-            modalTitle.innerText = `Visa Stamp: ${code}`;
+            modalTitle.innerText = `Visa Stamp: ${cleanCode}`;
             
             if (countryItems.length === 0) {
                 modalBody.innerHTML = '<div class="p-4 text-center text-muted">No finished items yet.</div>';
@@ -457,7 +468,14 @@
             renderMap(); renderHistory(); renderBacklog();
             closeModal();
 
-            fetch(`${API_URL}?action=logMovie&title=${encodeURIComponent(title)}&rating=${rating}&status=${status}&date=${date}`);
+            fetch(`${API_URL}?action=logMovie&title=${encodeURIComponent(title)}&rating=${rating}&status=${status}&date=${date}`)
+            .then(res => res.json())
+            .then(d => {
+                // Confirm save success if needed, or handle error
+            })
+            .catch(err => {
+                alert("Failed to save entry: " + err);
+            });
         }
 
         function logJournal() {
