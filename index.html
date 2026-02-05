@@ -6,20 +6,16 @@
     <title>Nexus OS</title>
     
     <!-- === APP ICON & WEB CLIP SETTINGS === -->
-    <!-- 1. Standard Favicon (Browser Tab) -->
     <link rel="icon" type="image/png" href="apple-touch-icon.png">
-    
-    <!-- 2. Apple Home Screen Icon (Web Clip) -->
-    <!-- UPLOAD A FILE NAMED 'apple-touch-icon.png' TO YOUR GITHUB REPO ROOT -->
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     
-    <!-- 3. Native App Look (Removes Safari Browser Chrome) -->
+    <!-- Modern Web App Capability (Fixes Deprecation Warning) -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <!-- Legacy iOS Support -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     
-    <!-- 4. Status Bar Color (Matches your App Theme) -->
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#f4f6f8">
-    
     <meta name="apple-mobile-web-app-title" content="Nexus">
 
     <!-- CSS Dependencies -->
@@ -51,7 +47,6 @@
             color: var(--text-main);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             padding-bottom: var(--nav-height);
-            /* Safe area for iPhone X+ home indicator */
             padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom)); 
         }
 
@@ -170,7 +165,6 @@
             border-top: 1px solid var(--border);
             display: flex; justify-content: space-around; align-items: center;
             z-index: 1000;
-            /* iOS Safe Area Support */
             padding-bottom: env(safe-area-inset-bottom);
             height: calc(var(--nav-height) + env(safe-area-inset-bottom));
         }
@@ -424,7 +418,7 @@
                     `}).join('');
                 }
 
-                // 2. Google Docs Journal (RESTORED)
+                // 2. Google Docs Journal
                 const journalContainer = document.getElementById('journal-feed');
                 if(data.journal && data.journal.length > 0) {
                     journalContainer.innerHTML = data.journal.map(j => `
@@ -458,8 +452,18 @@
                     titleInput.value = "";
                     loadDashboard(); // Refresh list
                 } else {
-                    alert("Error creating doc");
+                    // SPECIFIC ERROR HANDLING FOR PERMISSIONS
+                    alert("⚠️ Error: " + (data.message || "Failed to create Doc"));
+                    if(data.message && data.message.includes("ScriptError")) {
+                        alert("ACTION REQUIRED:\n\n1. Go to Apps Script Editor.\n2. Run 'createJournalDoc' function manually.\n3. Click 'Allow' on the permission popup.\n4. Redeploy as New Version.");
+                    }
                 }
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            })
+            .catch(err => {
+                // Network error usually means CORS/Permissions crash
+                alert("⚠️ Network Error (likely Permission issue):\n\n1. Go to Apps Script Editor.\n2. Run 'createJournalDoc' function manually to authorize Google Docs access.\n3. Redeploy as New Version.");
                 btn.innerHTML = originalHtml;
                 btn.disabled = false;
             });
