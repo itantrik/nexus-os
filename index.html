@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nexus OS</title>
     
+    <!-- CSS Dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap/dist/css/jsvectormap.min.css" />
@@ -12,20 +13,20 @@
     <style>
         :root {
             /* CLEAN LIGHT THEME */
-            --bg-body: #f0f2f5;       /* Light Grey Background */
-            --bg-card: #ffffff;       /* White Cards */
-            --text-main: #1c1e21;     /* Dark Text */
-            --text-muted: #65676b;    /* Grey Text */
-            --border: #e4e6eb;        /* Subtle Border */
+            --bg-body: #f4f6f8;       
+            --bg-card: #ffffff;       
+            --text-main: #212529;     
+            --text-muted: #6c757d;    
+            --border: #e9ecef;        
             
-            --primary: #0d6efd;       /* Bootstrap Blue */
-            --success: #198754;       /* Green */
+            --primary: #0d6efd;       
+            --success: #198754;       
             
-            --map-base: #e4e6eb;      /* Light Map Background */
-            --map-hover: #d8dadf;
-            --map-visited: #0d6efd;   /* Visited Country Color */
+            --map-base: #dee2e6;      
+            --map-hover: #ced4da;
+            --map-visited: #0d6efd;   
 
-            --nav-height: 65px;
+            --nav-height: 70px;
         }
 
         body {
@@ -35,74 +36,66 @@
             padding-bottom: var(--nav-height);
         }
 
-        h2, h5 { font-weight: 700; color: var(--text-main); }
-        h2 { font-size: 1.5rem; }
+        h2 { font-weight: 800; color: var(--text-main); font-size: 1.6rem; letter-spacing: -0.5px; }
+        h5 { font-weight: 700; font-size: 1rem; }
 
         /* CARDS */
         .nexus-card {
             background-color: var(--bg-card);
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 20px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Soft Shadow */
-        }
-
-        /* INPUTS */
-        .form-control, .form-select {
-            background-color: #f0f2f5;
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            border-radius: 8px;
-        }
-        .form-control:focus {
-            background-color: #fff;
-            box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+            margin-bottom: 16px;
+            border: 1px solid rgba(0,0,0,0.04);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
         }
 
         /* MAP */
         #world-map {
             width: 100%;
-            height: 320px;
+            height: 340px;
             background-color: var(--bg-card);
-            border-radius: 12px;
-            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            /* Removes border for cleaner look */
         }
 
         /* STATS */
-        .stat-number { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
-        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-number { font-size: 2rem; font-weight: 800; color: var(--primary); line-height: 1; }
+        .stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-top: 5px;}
 
         /* FILTERS */
+        .filter-container { white-space: nowrap; overflow-x: auto; padding-bottom: 4px; }
         .filter-btn {
             background: #fff;
             border: 1px solid var(--border);
             color: var(--text-muted);
-            padding: 6px 16px;
-            border-radius: 20px;
+            padding: 8px 18px;
+            border-radius: 24px;
             font-size: 0.85rem;
-            margin-right: 6px;
-            font-weight: 500;
+            margin-right: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
         }
         .filter-btn.active {
             background-color: var(--primary);
             color: #fff;
             border-color: var(--primary);
-            box-shadow: 0 2px 4px rgba(13, 110, 253, 0.3);
+            box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2);
         }
 
-        /* HISTORY LIST */
+        /* LIST ITEMS */
         .history-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 0;
+            padding: 14px 0;
             border-bottom: 1px solid var(--border);
         }
         .history-item:last-child { border-bottom: none; }
-        .item-title { font-weight: 600; font-size: 0.95rem; }
-        .item-meta { font-size: 0.8rem; color: var(--text-muted); }
+        .item-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 2px;}
+        .item-meta { font-size: 0.75rem; color: var(--text-muted); }
+        .item-rating { font-size: 0.75rem; color: #ffc107; }
 
-        /* TYPE BADGES */
-        .badge-type { font-size: 0.7rem; font-weight: 700; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
+        /* BADGES */
+        .badge-type { font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
         .bg-book { background-color: #e7f5ff; color: #007bff; }
         .bg-movie { background-color: #fff5f5; color: #dc3545; }
         .bg-music { background-color: #f3f0ff; color: #6f42c1; }
@@ -110,37 +103,40 @@
         /* NAV */
         .bottom-nav {
             position: fixed; bottom: 0; width: 100%; height: var(--nav-height);
-            background-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border-top: 1px solid var(--border);
             display: flex; justify-content: space-around; align-items: center;
             z-index: 1000;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
         }
         .nav-item {
             background: none; border: none; flex-grow: 1; text-align: center;
-            color: #b0b3b8; font-size: 0.7rem; font-weight: 500;
+            color: #adb5bd; font-size: 0.7rem; font-weight: 600; transition: color 0.2s;
         }
-        .nav-item i { display: block; font-size: 1.4rem; margin-bottom: 4px; }
+        .nav-item i { display: block; font-size: 1.5rem; margin-bottom: 4px; }
         .nav-item.active { color: var(--primary); }
 
-        .tab-content { display: none; padding: 15px; }
+        .tab-content { display: none; padding: 15px; padding-top: 20px; }
         .tab-content.active { display: block; }
         .d-none { display: none !important; }
     </style>
 </head>
 <body>
 
+    <!-- === VIEW 1: HQ === -->
     <div id="view-hq" class="tab-content active">
         <h2 class="mb-4">Nexus OS</h2>
         
+        <!-- Quick Log -->
         <div class="nexus-card">
             <h5 class="mb-3">Quick Journal</h5>
             <div class="input-group">
                 <input type="text" id="journalInput" class="form-control" placeholder="Write something...">
-                <button onclick="logJournal()" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i></button>
+                <button onclick="logJournal()" class="btn btn-primary px-4"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
 
+        <!-- Tasks -->
         <div class="nexus-card">
             <h5 class="mb-3">Tasks</h5>
             <div id="task-list">
@@ -149,39 +145,44 @@
         </div>
     </div>
 
+    <!-- === VIEW 2: VISA (Backlog) === -->
     <div id="view-visa" class="tab-content">
         <h2 class="mb-4">Visa Queue</h2>
-        <div class="nexus-card p-0" id="backlog-container">
+        <div class="nexus-card p-0 px-3" id="backlog-container">
             <div class="text-center text-muted py-5 small">Loading backlog...</div>
         </div>
     </div>
 
+    <!-- === VIEW 3: WORLD (Passport) === -->
     <div id="view-world" class="tab-content">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="mb-0">Passport</h2>
-            <button class="btn btn-primary btn-sm fw-bold shadow-sm" onclick="showMovieModal()">
-                <i class="fa-solid fa-plus"></i> Add Entry
+            <button class="btn btn-primary btn-sm fw-bold shadow-sm px-3 rounded-pill" onclick="showMovieModal()">
+                <i class="fa-solid fa-plus me-1"></i> Log
             </button>
         </div>
         
-        <div class="d-flex mb-3 overflow-auto pb-1">
+        <!-- Filters -->
+        <div class="d-flex mb-3 filter-container">
             <button class="filter-btn active" onclick="filterMap('All')">All</button>
             <button class="filter-btn" onclick="filterMap('Book')">Books</button>
             <button class="filter-btn" onclick="filterMap('Movie')">Movies</button>
             <button class="filter-btn" onclick="filterMap('Music')">Music</button>
         </div>
 
+        <!-- Map -->
         <div id="world-map" class="mb-3 shadow-sm"></div>
 
+        <!-- Stats -->
         <div class="row g-3">
             <div class="col-6">
-                <div class="nexus-card text-center py-3 mb-0">
+                <div class="nexus-card text-center py-4 mb-0">
                     <div id="stat-countries" class="stat-number">0</div>
                     <div class="stat-label">Countries</div>
                 </div>
             </div>
             <div class="col-6">
-                <div class="nexus-card text-center py-3 mb-0">
+                <div class="nexus-card text-center py-4 mb-0">
                     <div id="stat-items" class="stat-number">0</div>
                     <div class="stat-label">Items</div>
                 </div>
@@ -189,12 +190,14 @@
         </div>
     </div>
 
+    <!-- === VIEW 4: LOGS === -->
     <div id="view-history" class="tab-content">
         <h2 class="mb-3">Travel Logs</h2>
         <input type="text" id="historySearch" class="form-control mb-3 shadow-sm" placeholder="Search history..." onkeyup="renderHistory()">
-        <div id="history-container" class="nexus-card p-0 border-0 bg-transparent shadow-none"></div>
+        <div id="history-container" class="nexus-card p-0 px-3 border-0 bg-transparent shadow-none"></div>
     </div>
 
+    <!-- === NAV === -->
     <nav class="bottom-nav">
         <button class="nav-item active" onclick="switchTab('hq')"><i class="fa-solid fa-house"></i>HQ</button>
         <button class="nav-item" onclick="switchTab('visa')"><i class="fa-solid fa-hourglass-half"></i>Visa</button>
@@ -202,24 +205,25 @@
         <button class="nav-item" onclick="switchTab('history')"><i class="fa-solid fa-list"></i>Logs</button>
     </nav>
 
+    <!-- === MODAL: LOG ENTRY === -->
     <div id="movieModal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content border-0 shadow">
-            <div class="modal-header border-bottom-0">
-              <h5 class="modal-title fw-bold">Log Entry</h5>
+          <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-bottom-0 pb-0">
+              <h5 class="modal-title fw-bold ms-2">Add Entry</h5>
               <button type="button" class="btn-close" onclick="closeModal()"></button>
             </div>
-            <div class="modal-body pt-0">
-              <label class="small text-muted fw-bold mb-1">TITLE</label>
+            <div class="modal-body pt-3 pb-4">
+              <label class="small text-muted fw-bold mb-1 ms-1">TITLE</label>
               <input type="text" id="mTitle" class="form-control mb-3" placeholder="e.g. Inception">
               
-              <div class="form-check form-switch mb-3 p-3 bg-light rounded">
-                  <input class="form-check-input" type="checkbox" id="watchedCheck" onchange="toggleRatingFields()">
+              <div class="form-check form-switch mb-4 p-3 bg-light rounded" style="margin-left: 0;">
+                  <input class="form-check-input ms-0 me-2" type="checkbox" id="watchedCheck" onchange="toggleRatingFields()">
                   <label class="form-check-label small fw-bold" for="watchedCheck">I have finished this</label>
               </div>
 
               <div id="ratingFields" class="d-none">
-                  <label class="small text-muted fw-bold mb-1">RATING</label>
+                  <label class="small text-muted fw-bold mb-1 ms-1">RATING</label>
                   <select id="mRating" class="form-select mb-3">
                       <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
                       <option value="4">⭐⭐⭐⭐ Good</option>
@@ -228,17 +232,32 @@
                       <option value="1">⭐ Terrible</option>
                   </select>
                   
-                  <label class="small text-muted fw-bold mb-1">DATE FINISHED</label>
+                  <label class="small text-muted fw-bold mb-1 ms-1">DATE FINISHED</label>
                   <input type="date" id="mDate" class="form-control">
               </div>
-            </div>
-            <div class="modal-footer border-top-0">
-              <button class="btn btn-primary w-100 fw-bold py-2" onclick="handleSave()">Save Entry</button>
+              
+              <button class="btn btn-primary w-100 fw-bold py-3 mt-2 rounded-pill shadow-sm" onclick="handleSave()">Save to Passport</button>
             </div>
           </div>
         </div>
     </div>
 
+    <!-- === MODAL: COUNTRY DETAILS === -->
+    <div id="countryModal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-bottom-0">
+              <h5 class="modal-title fw-bold" id="countryModalTitle">Country</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0" id="countryModalBody">
+                <!-- Items injected here -->
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsvectormap"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/maps/world.js"></script>
@@ -267,7 +286,8 @@
             fetch(`${API_URL}?action=getPassport`)
             .then(res => res.json())
             .then(data => {
-                // FORCE RATINGS TO NUMBERS
+                // Ensure correct field names matching Google Sheet Headers
+                // Headers are: Title, Creator, Type, Country_Code, Date_Finished, Rating
                 fullData = data.map(d => ({
                     ...d,
                     Rating: (d.Rating === "" || d.Rating === undefined || d.Rating === null) ? 0 : Number(d.Rating)
@@ -276,7 +296,8 @@
                 renderMap();
                 renderHistory();
                 renderBacklog();
-            });
+            })
+            .catch(e => console.error("Fetch Error:", e));
         }
 
         // MAP RENDERING
@@ -308,39 +329,71 @@
                 map: "world",
                 zoomButtons: false,
                 visualizeData: {
-                    scale: ['#e4e6eb', '#0d6efd'], // Light Grey to Blue
+                    scale: ['#dee2e6', '#0d6efd'], // Base to Active
                     values: Object.keys(countryStats).reduce((acc, code) => ({...acc, [code]: 1}), {})
                 },
                 regionStyle: {
-                    initial: { fill: '#e4e6eb' }, // Base Color
-                    hover: { fill: '#d8dadf' },
-                    selected: { fill: '#0d6efd' } // Visited Color
+                    initial: { fill: '#dee2e6' },
+                    hover: { fill: '#ced4da', cursor: 'pointer' },
+                    selected: { fill: '#0d6efd' }
                 },
                 series: {
                     regions: [{
-                        scale: { 1: '#0d6efd' }, // Force Blue
+                        scale: { 1: '#0d6efd' }, 
                         attribute: 'fill',
                         values: Object.keys(countryStats).reduce((acc, code) => ({...acc, [code]: 1}), {})
                     }]
+                },
+                // CLICK INTERACTION
+                onRegionClick(event, code) {
+                    showCountryDetails(code);
                 }
             });
+        }
+
+        // CLICK HANDLER: Show Country Modal
+        function showCountryDetails(code) {
+            const countryItems = fullData.filter(d => d.Country_Code === code && d.Rating > 0);
+            const modalTitle = document.getElementById('countryModalTitle');
+            const modalBody = document.getElementById('countryModalBody');
+            
+            modalTitle.innerText = `Visa Stamp: ${code}`;
+            
+            if (countryItems.length === 0) {
+                modalBody.innerHTML = '<div class="p-4 text-center text-muted">No finished items yet.</div>';
+            } else {
+                const html = countryItems.map(d => `
+                    <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                        <div>
+                            <div class="fw-bold">${d.Title}</div>
+                            <div class="small text-muted">${d.Creator || "Unknown"}</div>
+                        </div>
+                        <span class="badge-type ${getBadgeClass(d.Type)}">${d.Type}</span>
+                    </div>
+                `).join('');
+                modalBody.innerHTML = html;
+            }
+            
+            new bootstrap.Modal(document.getElementById('countryModal')).show();
         }
 
         // HISTORY LIST
         function renderHistory() {
             const query = document.getElementById('historySearch').value.toLowerCase();
             const completed = fullData.filter(d => d.Rating > 0).reverse();
-            const filtered = completed.filter(d => d.Title.toLowerCase().includes(query));
+            const filtered = completed.filter(d => d.Title && d.Title.toLowerCase().includes(query));
 
             const html = filtered.map(d => `
-                <div class="history-item bg-white px-3 mb-2 rounded border">
+                <div class="history-item">
                     <div>
                         <div class="item-title">${d.Title}</div>
-                        <div class="item-meta">${d.Creator || "?"} • ${d.Country_Code}</div>
+                        <div class="item-meta">
+                            ${d.Creator || "?"} • <span class="fw-bold text-dark">${d.Country_Code}</span>
+                        </div>
                     </div>
                     <div class="text-end">
                         <span class="badge-type ${getBadgeClass(d.Type)}">${d.Type}</span>
-                        <div class="text-warning small mt-1">${"★".repeat(Math.round(d.Rating))}</div>
+                        <div class="item-rating mt-1">${"★".repeat(Math.round(d.Rating))}</div>
                     </div>
                 </div>
             `).join('');
@@ -351,7 +404,7 @@
         function renderBacklog() {
             const backlog = fullData.filter(d => d.Rating === 0);
             const html = backlog.map(d => `
-                <div class="history-item bg-white px-3 mb-2 rounded border">
+                <div class="history-item">
                     <div>
                         <div class="item-title">${d.Title}</div>
                         <div class="item-meta">${d.Creator || "Unknown"}</div>
@@ -363,6 +416,7 @@
         }
 
         function getBadgeClass(type) {
+            if(!type) return "";
             if(type.includes("Book")) return "bg-book";
             if(type.includes("Movie")) return "bg-movie";
             return "bg-music";
