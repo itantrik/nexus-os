@@ -170,4 +170,211 @@
               
               <div class="form-check form-switch mb-3">
                   <input class="form-check-input" type="checkbox" id="watchedCheck" onchange="toggleRatingFields()">
-                  <label class="form-check-label text-white" for="watchedCheck">I have already watched/read this</label
+                  <label class="form-check-label text-white" for="watchedCheck">I have already watched/read this</label>
+              </div>
+
+              <div id="ratingFields" class="d-none">
+                  <select id="mRating" class="form-control bg-black text-white mb-2 border-secondary">
+                      <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                      <option value="4">⭐⭐⭐⭐ (4)</option>
+                      <option value="3">⭐⭐⭐ (3)</option>
+                      <option value="2">⭐⭐ (2)</option>
+                      <option value="1">⭐ (1)</option>
+                  </select>
+                  <input type="date" id="mDate" class="form-control bg-black text-white border-secondary">
+              </div>
+            </div>
+            <div class="modal-footer border-secondary">
+              <button class="btn btn-success w-100" onclick="handleSave()">Save Entry</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsvectormap"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/maps/world.js"></script>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbzEdsHSoG_yfkB_lMKe7RjQoCvd9d0egA1s7LXtuSz8Se6WLjIHSeNQlK0-xOO9C7yw/exec";
+        
+        let fullData = [];
+        let mapInstance = null;
+        let currentFilter = 'All';
+
+        // --- NAVIGATION ---
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-${tabName}`).classList.add('active');
+            event.currentTarget.classList.add('active');
+
+            if(fullData.length === 0) fetchData(); 
+            else if(tabName === 'world') setTimeout(renderMap, 100); 
+        }
+
+        // --- DATA ENGINE ---
+        function fetchData() {
+            fetch(`${API_URL}?action=getPassport`)
+            .then(res => res.json())
+            .then(data => {
+                // CLEAN DATA: Ensure Ratings are Numbers
+                fullData = data.map(d => ({
+                    ...d,
+                    Rating: (d.Rating === "" || d.Rating === undefined) ? 0 : Number(d.Rating)
+                }));
+                
+                renderMap();
+                renderHistory();
+                renderBacklog();
+            });
+        }
+
+        // --- MAP LOGIC (Green/Grey) ---
+        function filterMap(type) {
+            currentFilter = type;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.toggle('active', btn.innerText === type));
+            renderMap();
+        }
+
+        function renderMap() {
+            // Filter: Only Completed Items (Rating > 0)
+            const activeItems = fullData.filter(d => d.Rating > 0);
+            const filteredData = currentFilter === 'All' ? activeItems : activeItems.filter(d => d.Type.includes(currentFilter));
+
+            // Aggregate Data
+            const countryStats = {};
+            filteredData.forEach(item => {
+                const code = item.Country_Code;
+                if(!code || code === '??') return;
+                if(!countryStats[code]) countryStats[code] = 0;
+                countryStats[code]++;
+            });
+
+            document.getElementById('stat-countries').innerText = Object.keys(countryStats).length;
+            document.getElementById('stat-items').innerText = filteredData.length;
+
+            document.getElementById('world-map').innerHTML = "";
+
+            mapInstance = new jsVectorMap({
+                selector: "#world-map",
+                map: "world",
+                zoomButtons: false,
+                visualizeData: {
+                    scale: ['#2c3e50', '#27ae60'], // Grey to Green
+                    values: Object.keys(countryStats).reduce((acc, code) => ({...acc, [code]: 1}), {})
+                },
+                regionStyle: {
+                    initial: { fill: '#343a40' }, // Dark Grey base
+                    hover: { fill: '#495057' },
+                    selected: { fill: '#27ae60' } // Green
+                },
+                series: {
+                    regions: [{
+                        scale: { 1: '#27ae60' }, // Force Green
+                        attribute: 'fill',
+                        values: Object.keys(countryStats).reduce((acc, code) => ({...acc, [code]: 1}), {})
+                    }]
+                }
+            });
+        }
+
+        // --- HISTORY (Logs) ---
+        function renderHistory() {
+            const query = document.getElementById('historySearch').value.toLowerCase();
+            const completed = fullData.filter(d => d.Rating > 0).reverse(); // Rating > 0 means done
+            const filtered = completed.filter(d => d.Title.toLowerCase().includes(query));
+
+            const html = filtered.map(d => `
+                <div class="history-item">
+                    <div>
+                        <div class="fw-bold text-white">${d.Title}</div>
+                        <div class="small text-muted">${d.Creator || "?"} • ${d.Country_Code}</div>
+                    </div>
+                    <div class="text-end">
+                        <span class="type-badge ${getTypeClass(d.Type)}">${d.Type}</span>
+                        <div class="text-warning small mt-1">${"★".repeat(Math.round(d.Rating))}</div>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('history-container').innerHTML = html || '<div class="text-muted text-center mt-3">No history found.</div>';
+        }
+
+        // --- BACKLOG (Visa) ---
+        function renderBacklog() {
+            // Rating 0 means backlog
+            const backlog = fullData.filter(d => d.Rating === 0);
+            
+            const html = backlog.map(d => `
+                <div class="history-item">
+                    <div>
+                        <div class="fw-bold text-white">${d.Title}</div>
+                        <div class="small text-muted">${d.Creator || "Unknown"}</div>
+                    </div>
+                    <span class="badge bg-secondary">In Queue</span>
+                </div>
+            `).join('');
+            document.getElementById('backlog-container').innerHTML = html || '<div class="text-muted text-center mt-5">Visa queue empty.</div>';
+        }
+
+        function getTypeClass(type) {
+            if(type.includes("Book")) return "type-book";
+            if(type.includes("Movie")) return "type-movie";
+            return "type-music";
+        }
+
+        // --- NEW MODAL LOGIC ---
+        let modalInstance = null;
+        function showMovieModal() {
+            modalInstance = new bootstrap.Modal(document.getElementById('movieModal'));
+            modalInstance.show();
+            // Reset fields
+            document.getElementById('mTitle').value = "";
+            document.getElementById('watchedCheck').checked = false;
+            document.getElementById('ratingFields').classList.add('d-none');
+            document.getElementById('mDate').valueAsDate = new Date();
+        }
+
+        function toggleRatingFields() {
+            const isWatched = document.getElementById('watchedCheck').checked;
+            const fields = document.getElementById('ratingFields');
+            if (isWatched) fields.classList.remove('d-none');
+            else fields.classList.add('d-none');
+        }
+
+        function closeModal() { if(modalInstance) modalInstance.hide(); }
+
+        function handleSave() {
+            const title = document.getElementById('mTitle').value;
+            const isWatched = document.getElementById('watchedCheck').checked;
+            
+            if(!title) { alert("Title required"); return; }
+            
+            // If Watched: Rating is user value. If Watchlist: Rating is 0.
+            const rating = isWatched ? document.getElementById('mRating').value : 0;
+            const status = isWatched ? 'watched' : 'watchlist';
+            const date = isWatched ? document.getElementById('mDate').value : "";
+
+            // Optimistic UI
+            fullData.push({ Title: title, Creator: "Unknown", Type: "Movie", Country_Code: "??", Rating: Number(rating) });
+            renderMap(); renderHistory(); renderBacklog();
+            closeModal();
+
+            // API Call
+            fetch(`${API_URL}?action=logMovie&title=${encodeURIComponent(title)}&rating=${rating}&status=${status}&date=${date}`)
+            .then(res => res.json());
+        }
+
+        function logJournal() {
+            const text = document.getElementById('journalInput').value;
+            if(!text) return;
+            fetch(`${API_URL}?action=logJournal&text=${encodeURIComponent(text)}`);
+            document.getElementById('journalInput').value = "";
+            alert("Journal Logged");
+        }
+
+        // INIT
+        fetchData();
+    </script>
+</body>
+</html>
