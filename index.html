@@ -35,9 +35,11 @@
             --primary: #0d6efd;       
             --success: #198754;       
             
-            --map-base: #e9ecef;      
-            --map-hover: #dee2e6;
-            
+            /* MAP COLORS - INCREASED CONTRAST */
+            --map-base: #d1d5db;      /* Darker Grey for better visibility */
+            --map-hover: #9ca3af;     /* Darker hover state */
+            --map-visited: #0d6efd;   
+
             /* Heatmap Scale (Light to Dark) */
             --heat-min: #89CFF0; /* Baby Blue */
             --heat-max: #003366; /* Deep Navy */
@@ -552,8 +554,8 @@
                     values: mapValues
                 },
                 regionStyle: {
-                    initial: { fill: '#e9ecef' }, // Empty Country Base
-                    hover: { fill: '#ced4da', cursor: 'pointer' },
+                    initial: { fill: '#d1d5db' }, // Empty Country Base
+                    hover: { fill: '#9ca3af', cursor: 'pointer' },
                     selected: { fill: '#0d6efd' }
                 },
                 series: { 
