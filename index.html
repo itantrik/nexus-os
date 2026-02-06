@@ -35,9 +35,12 @@
             --primary: #0d6efd;       
             --success: #198754;       
             
-            --map-base: #dee2e6;      
-            --map-hover: #ced4da;
-            --map-visited: #0d6efd;   
+            --map-base: #e9ecef;      
+            --map-hover: #dee2e6;
+            
+            /* Heatmap Scale (Light to Dark) */
+            --heat-min: #89CFF0; /* Baby Blue */
+            --heat-max: #003366; /* Deep Navy */
 
             --nav-height: 70px;
         }
@@ -235,14 +238,21 @@
         
         <!-- Filters -->
         <div class="d-flex mb-3 filter-container">
-            <button class="filter-btn active" onclick="filterMap('All')">All</button>
-            <button class="filter-btn" onclick="filterMap('Book')">Books</button>
-            <button class="filter-btn" onclick="filterMap('Movie')">Movies</button>
-            <button class="filter-btn" onclick="filterMap('Music')">Music</button>
+            <button class="filter-btn active" onclick="filterMap('All')" data-filter="All">All</button>
+            <button class="filter-btn" onclick="filterMap('Book')" data-filter="Book">Books</button>
+            <button class="filter-btn" onclick="filterMap('Movie')" data-filter="Movie">Movies</button>
+            <button class="filter-btn" onclick="filterMap('Music')" data-filter="Music">Music</button>
         </div>
 
         <!-- Map -->
-        <div id="world-map" class="mb-3 shadow-sm"></div>
+        <div id="world-map" class="shadow-sm"></div>
+        
+        <!-- Map Legend -->
+        <div class="d-flex align-items-center justify-content-between px-2 mt-2 mb-3">
+            <small class="text-muted fw-bold">1</small>
+            <div class="flex-grow-1 mx-3" style="height: 8px; background: linear-gradient(to right, var(--heat-min), var(--heat-max)); border-radius: 4px;"></div>
+            <small class="text-muted fw-bold" id="legend-max">Max</small>
+        </div>
 
         <!-- Stats -->
         <div class="row g-3">
@@ -488,7 +498,9 @@
         // MAP RENDERING
         function filterMap(type) {
             currentFilter = type;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.toggle('active', btn.innerText === type));
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-filter') === type);
+            });
             renderMap();
         }
 
@@ -497,15 +509,34 @@
             const filteredData = currentFilter === 'All' ? activeItems : activeItems.filter(d => d.Type.includes(currentFilter));
 
             const countryStats = {};
+            let maxCount = 0; // Track max for heatmap scaling
+
             filteredData.forEach(item => {
                 const code = item.Country_Code;
                 if(!code || code === '??') return;
                 const cleanCode = code.toUpperCase(); 
-                if(!countryStats[cleanCode]) countryStats[cleanCode] = { total: 0, Book: 0, Movie: 0, Music: 0 };
+                
+                if(!countryStats[cleanCode]) {
+                    countryStats[cleanCode] = { total: 0, Book: 0, Movie: 0, Music: 0 };
+                }
                 countryStats[cleanCode].total++;
+                
+                // Track Types
                 if (item.Type.includes('Book')) countryStats[cleanCode].Book++;
                 else if (item.Type.includes('Movie')) countryStats[cleanCode].Movie++;
                 else if (item.Type.includes('Music')) countryStats[cleanCode].Music++;
+            });
+
+            // Calculate Max Value for Heatmap & Legend
+            Object.values(countryStats).forEach(s => {
+                if (s.total > maxCount) maxCount = s.total;
+            });
+            document.getElementById('legend-max').innerText = maxCount > 0 ? maxCount : "Max";
+
+            // Prepare Values Object for Map { "US": 50, "IN": 12 }
+            const mapValues = {};
+            Object.keys(countryStats).forEach(code => {
+                mapValues[code] = countryStats[code].total;
             });
 
             document.getElementById('stat-countries').innerText = Object.keys(countryStats).length;
@@ -517,15 +548,21 @@
                 map: "world",
                 zoomButtons: false,
                 visualizeData: {
-                    scale: ['#dee2e6', '#0d6efd'],
-                    values: Object.keys(countryStats).reduce((acc, code) => ({...acc, [code]: 1}), {})
+                    scale: ['#89CFF0', '#003366'], // Light Blue -> Navy Heatmap
+                    values: mapValues
                 },
                 regionStyle: {
-                    initial: { fill: '#dee2e6' },
+                    initial: { fill: '#e9ecef' }, // Empty Country Base
                     hover: { fill: '#ced4da', cursor: 'pointer' },
                     selected: { fill: '#0d6efd' }
                 },
-                series: { regions: [{ scale: { 1: '#0d6efd' }, attribute: 'fill', values: Object.keys(countryStats).reduce((acc, code) => ({...acc, [code]: 1}), {}) }] },
+                series: { 
+                    regions: [{ 
+                        attribute: 'fill', 
+                        scale: ['#89CFF0', '#003366'], // Heatmap Gradient
+                        values: mapValues
+                    }] 
+                },
                 onRegionTooltipShow(event, tooltip, code) {
                     const c = code.toUpperCase();
                     const s = countryStats[c];
