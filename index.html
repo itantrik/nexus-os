@@ -35,9 +35,10 @@
             --primary: #0d6efd;       
             --success: #198754;       
             
-            /* MAP COLORS - INCREASED CONTRAST */
-            --map-base: #d1d5db;      /* Darker Grey for better visibility */
-            --map-hover: #9ca3af;     /* Darker hover state */
+            /* MAP COLORS - HIGH CONTRAST */
+            --map-base: #adb5bd;      /* Visible Grey for empty countries */
+            --map-border: #ffffff;    /* White borders for definition */
+            --map-hover: #6c757d;     /* Darker hover state */
             --map-visited: #0d6efd;   
 
             /* Heatmap Scale (Light to Dark) */
@@ -360,6 +361,24 @@
         let movieModal = null;
         let countryModal = null;
 
+        // HELPER: Normalize Country Codes to merge 'US ', 'USA' -> 'US'
+        function normalizeCountryCode(code) {
+            if (!code) return null;
+            let c = code.toString().trim().toUpperCase();
+            
+            const map = {
+                'USA': 'US', 'UNITED STATES': 'US', 'U.S.A.': 'US',
+                'UK': 'GB', 'UNITED KINGDOM': 'GB', 'GREAT BRITAIN': 'GB', 'ENGLAND': 'GB',
+                'UAE': 'AE',
+                'S. KOREA': 'KR', 'SOUTH KOREA': 'KR', 'KOREA': 'KR',
+                'RUSSIA': 'RU',
+                'VIETNAM': 'VN',
+                'GERMANY': 'DE',
+                'JAPAN': 'JP'
+            };
+            return map[c] || c;
+        }
+
         // NAVIGATION
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -514,9 +533,10 @@
             let maxCount = 0; // Track max for heatmap scaling
 
             filteredData.forEach(item => {
-                const code = item.Country_Code;
-                if(!code || code === '??') return;
-                const cleanCode = code.toUpperCase(); 
+                // NORMALIZE COUNTRY CODE HERE
+                const rawCode = item.Country_Code;
+                if(!rawCode || rawCode === '??') return;
+                const cleanCode = normalizeCountryCode(rawCode);
                 
                 if(!countryStats[cleanCode]) {
                     countryStats[cleanCode] = { total: 0, Book: 0, Movie: 0, Music: 0 };
@@ -554,8 +574,12 @@
                     values: mapValues
                 },
                 regionStyle: {
-                    initial: { fill: '#d1d5db' }, // Empty Country Base
-                    hover: { fill: '#9ca3af', cursor: 'pointer' },
+                    initial: { 
+                        fill: '#adb5bd', 
+                        stroke: '#ffffff', 
+                        strokeWidth: 0.5 
+                    },
+                    hover: { fill: '#6c757d', cursor: 'pointer' },
                     selected: { fill: '#0d6efd' }
                 },
                 series: { 
@@ -599,8 +623,12 @@
         }
 
         function showCountryDetails(code) {
-            const cleanCode = code.toUpperCase();
-            const countryItems = fullData.filter(d => d.Country_Code && d.Country_Code.toUpperCase() === cleanCode && d.Rating > 0);
+            const cleanCode = normalizeCountryCode(code); // USE NORMALIZED CODE HERE TOO
+            const countryItems = fullData.filter(d => {
+                const itemCode = normalizeCountryCode(d.Country_Code);
+                return itemCode === cleanCode && d.Rating > 0;
+            });
+            
             const modalBody = document.getElementById('countryModalBody');
             document.getElementById('countryModalTitle').innerText = `Visa Stamp: ${cleanCode}`;
             if (countryItems.length === 0) modalBody.innerHTML = '<div class="p-4 text-center text-muted">No finished items yet.</div>';
