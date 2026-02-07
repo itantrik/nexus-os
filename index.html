@@ -61,7 +61,7 @@
 
         #world-map {
             width: 100%;
-            height: 340px;
+            height: 550px; /* Increased height for better zooming */
             background-color: var(--bg-card);
             border-radius: 16px;
             overflow: hidden;
@@ -190,25 +190,16 @@
 
         <!-- TickTick Tasks -->
         <div class="nexus-card">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="mb-3">
                 <h5 class="mb-0 text-success"><i class="fa-solid fa-check-circle me-2"></i>Today's Tasks</h5>
-                <small class="text-muted" style="font-size: 0.7rem;">SYNCED</small>
             </div>
             <div id="task-list">
-                <div class="text-center text-muted small py-3">Syncing...</div>
+                <div class="text-center text-muted small py-3">Loading...</div>
             </div>
         </div>
     </div>
 
-    <!-- === VIEW 2: WATCHLIST (Formerly Visa) === -->
-    <div id="view-visa" class="tab-content">
-        <h2 class="mb-4">Watchlist</h2>
-        <div class="nexus-card p-0 px-3" id="backlog-container">
-            <div class="text-center text-muted py-5 small">Loading list...</div>
-        </div>
-    </div>
-
-    <!-- === VIEW 3: PASSPORT (Map) === -->
+    <!-- === VIEW 2: PASSPORT (Map) === -->
     <div id="view-world" class="tab-content">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="mb-0">Passport</h2>
@@ -249,6 +240,14 @@
         </div>
     </div>
 
+    <!-- === VIEW 3: WATCHLIST (Formerly Visa) === -->
+    <div id="view-visa" class="tab-content">
+        <h2 class="mb-4">Watchlist</h2>
+        <div class="nexus-card p-0 px-3" id="backlog-container">
+            <div class="text-center text-muted py-5 small">Loading list...</div>
+        </div>
+    </div>
+
     <!-- === VIEW 4: HISTORY === -->
     <div id="view-history" class="tab-content">
         <h2 class="mb-3">History</h2>
@@ -279,8 +278,8 @@
     <!-- === NAV === -->
     <nav class="bottom-nav">
         <button class="nav-item active" onclick="switchTab('hq')"><i class="fa-solid fa-house"></i>HQ</button>
-        <button class="nav-item" onclick="switchTab('visa')"><i class="fa-solid fa-bookmark"></i>List</button>
         <button class="nav-item" onclick="switchTab('world')"><i class="fa-solid fa-earth-americas"></i>Map</button>
+        <button class="nav-item" onclick="switchTab('visa')"><i class="fa-solid fa-bookmark"></i>List</button>
         <button class="nav-item" onclick="switchTab('history')"><i class="fa-solid fa-clock-rotate-left"></i>Log</button>
     </nav>
 
