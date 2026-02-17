@@ -21,27 +21,26 @@
     <style>
         :root {
             /* DARK THEME PALETTE */
-            --bg-body: #121212;       /* Almost Black */
-            --bg-card: #1e1e1e;       /* Material Dark Surface */
-            --text-main: #e4e6eb;     /* High Emphasis */
-            --text-muted: #b0b3b8;    /* Medium Emphasis */
-            --border: #2d2d2d;        /* Subtle Border */
-            --input-bg: #2a2a2a;      /* Inputs */
+            --bg-body: #121212;       /* Black Background */
+            --bg-card: #1e1e1e;       /* Dark Grey Surface */
+            --text-main: #ffffff;     /* Pure White for Max Contrast */
+            --text-muted: #b0b3b8;    /* Light Grey */
+            --border: #333333;        /* Visible Border */
+            --input-bg: #2c2c2c;      /* Input Fields */
             
-            --primary: #4dabf7;       /* Lighter Blue for contrast */
-            --primary-dim: rgba(77, 171, 247, 0.15);
+            --primary: #4dabf7;       
             --success: #2ecc71;       
             
-            /* MAP COLORS */
-            --map-base: #2d2d2d;      
-            --map-border: #121212;    
-            --map-hover: #404040;     
+            /* MAP COLORS - FIXED CONTRAST */
+            --map-base: #383838;      /* Distinct Grey for Empty Countries */
+            --map-border: #1e1e1e;    /* Matches Card BG for separation */
+            --map-hover: #505050;     /* Lighter Grey on Hover */
             
-            /* Heatmap: Dark Blue -> Bright Neon Blue */
-            --heat-min: #1c4e80; 
-            --heat-max: #00d2ff; 
+            /* Heatmap: Primary Blue -> Bright Neon Cyan */
+            --heat-min: #0d6efd;      /* 1 Visit = Bright Blue (Highly Visible) */
+            --heat-max: #00ffff;      /* Max Visits = Neon Cyan (Glowing) */
 
-            --nav-height: 70px;
+            --nav-height: 75px;
         }
 
         body {
@@ -51,17 +50,17 @@
             padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom)); 
         }
 
-        h2 { font-weight: 800; color: var(--text-main); font-size: 1.6rem; letter-spacing: -0.5px; }
-        h5 { font-weight: 700; font-size: 1rem; margin-bottom: 12px; color: var(--text-main); }
+        h2 { font-weight: 900; color: var(--text-main); font-size: 1.8rem; letter-spacing: -0.5px; margin-bottom: 20px; }
+        h5 { font-weight: 800; font-size: 1.1rem; margin-bottom: 15px; color: var(--text-main); letter-spacing: 0.3px; }
 
         /* CARDS */
         .nexus-card {
             background-color: var(--bg-card);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
+            border-radius: 18px;
+            padding: 22px;
+            margin-bottom: 18px;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
         }
 
         /* INPUTS & SELECTS */
@@ -69,145 +68,171 @@
             background-color: var(--input-bg);
             border: 1px solid var(--border);
             color: var(--text-main);
-            border-radius: 10px;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 1rem;
         }
         .form-control:focus, .form-select:focus {
             background-color: #333;
             color: #fff;
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.25);
+            box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.4);
         }
         .input-group-text {
             background-color: var(--input-bg);
             border: 1px solid var(--border);
             color: var(--text-muted);
         }
-        
-        /* PLACEHOLDER COLOR */
-        ::placeholder { color: #666 !important; opacity: 1; }
+        ::placeholder { color: #888 !important; opacity: 1; }
 
-        /* MAP */
+        /* TOAST NOTIFICATION */
+        .toast-box {
+            position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+            background: rgba(46, 204, 113, 0.95); color: #000; padding: 12px 24px;
+            border-radius: 30px; font-weight: 700; font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.3s, bottom 0.3s;
+            pointer-events: none; z-index: 2000; letter-spacing: 0.5px;
+        }
+        .toast-box.show { opacity: 1; bottom: 100px; }
+
+        /* MAP CONTAINER */
         #world-map {
             width: 100%;
-            height: 550px; 
-            background-color: var(--bg-card);
+            height: 500px; 
+            background-color: var(--bg-card); /* Match card */
             border-radius: 16px;
             overflow: hidden;
+            border: 1px solid var(--border); /* Define edges */
         }
         
+        /* Map Tooltip */
         .jvm-tooltip {
-            background-color: #333;
+            background-color: #000;
+            border: 1px solid #444;
             border-radius: 8px;
-            padding: 8px 12px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            padding: 10px 14px;
+            font-family: sans-serif;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
             z-index: 9999;
             color: white;
         }
+        
+        /* Map Zoom Buttons (Restyled for Dark Mode) */
+        .jvm-zoom-btn {
+            background-color: #333 !important;
+            color: white !important;
+            border: 1px solid #555 !important;
+            padding: 5px !important;
+            border-radius: 4px !important;
+        }
 
-        .stat-number { font-size: 2rem; font-weight: 800; color: var(--primary); line-height: 1; }
-        .stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-top: 5px;}
+        /* STATS */
+        .stat-number { font-size: 2.2rem; font-weight: 900; color: var(--primary); line-height: 1; text-shadow: 0 0 10px rgba(77, 171, 247, 0.2); }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-top: 8px;}
 
         /* FILTERS */
-        .filter-container { white-space: nowrap; overflow-x: auto; padding-bottom: 4px; }
+        .filter-container { white-space: nowrap; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; }
         .filter-btn {
             background: var(--bg-card);
             border: 1px solid var(--border);
             color: var(--text-muted);
-            padding: 8px 18px;
+            padding: 8px 20px;
             border-radius: 24px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             margin-right: 8px;
-            font-weight: 600;
+            font-weight: 700;
             transition: all 0.2s;
         }
         .filter-btn.active {
             background-color: var(--primary);
             color: #121212;
             border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(77, 171, 247, 0.4);
+            box-shadow: 0 0 12px rgba(77, 171, 247, 0.5);
         }
 
         /* TASKS */
         .task-item {
             display: flex; align-items: center; 
-            padding: 12px 0; border-bottom: 1px solid var(--border);
+            padding: 14px 0; border-bottom: 1px solid var(--border);
         }
         .task-item:last-child { border-bottom: none; }
-        .task-icon { color: #6c757d; font-size: 1.1rem; margin-right: 12px; flex-shrink: 0; }
-        .task-text { flex-grow: 1; font-weight: 500; font-size: 0.95rem; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 10px; color: var(--text-main); }
-        .task-date-col { font-size: 0.75rem; font-weight: 600; white-space: nowrap; flex-shrink: 0; min-width: 60px; text-align: right; }
+        .task-icon { color: #6c757d; font-size: 1.2rem; margin-right: 14px; flex-shrink: 0; }
+        .task-text { flex-grow: 1; font-weight: 600; font-size: 1rem; line-height: 1.4; color: var(--text-main); }
+        .task-date-col { font-size: 0.8rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; min-width: 70px; text-align: right; }
         
-        .prio-high { color: #ff6b6b; }
+        .prio-high { color: #ff6b6b; text-shadow: 0 0 5px rgba(255, 107, 107, 0.4); }
         .prio-med { color: #fcc419; }
         .prio-low { color: #4dabf7; }
-        .date-overdue { color: #ff6b6b; }
-        .date-today { color: #51cf66; }
-        .date-future { color: #868e96; }
+        .date-overdue { color: #ff6b6b; font-weight: 800; }
+        .date-today { color: #2ecc71; font-weight: 800; }
+        .date-future { color: #888; }
 
         /* JOURNAL LINKS */
         .journal-item {
-            border-left: 3px solid var(--primary);
-            padding-left: 12px;
-            margin-bottom: 12px;
+            border-left: 4px solid var(--primary);
+            padding-left: 14px;
+            margin-bottom: 14px;
             display: block;
             text-decoration: none;
-            transition: opacity 0.2s;
+            transition: all 0.2s;
+            background: linear-gradient(90deg, rgba(77, 171, 247, 0.05) 0%, transparent 100%);
+            padding: 10px 14px;
+            border-radius: 0 8px 8px 0;
         }
-        .journal-item:hover { opacity: 0.7; }
-        .journal-date { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
-        .journal-text { font-size: 0.95rem; color: var(--text-main); font-weight: 500; margin-top: 2px; }
+        .journal-item:hover { background: rgba(77, 171, 247, 0.1); }
+        .journal-date { font-size: 0.75rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .journal-text { font-size: 1rem; color: var(--text-main); font-weight: 600; margin-top: 4px; }
 
-        /* HISTORY LIST */
+        /* LISTS */
         .history-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 14px 0;
+            padding: 16px 0;
             border-bottom: 1px solid var(--border);
         }
         .history-item:last-child { border-bottom: none; }
-        .item-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; color: var(--text-main);}
-        .item-meta { font-size: 0.75rem; color: var(--text-muted); }
-        .item-rating { font-size: 0.75rem; color: #fcc419; }
+        .item-title { font-weight: 700; font-size: 1rem; margin-bottom: 4px; color: var(--text-main);}
+        .item-meta { font-size: 0.8rem; color: var(--text-muted); }
+        .item-rating { font-size: 0.8rem; color: #fcc419; }
 
         /* DARK MODE BADGES */
-        .badge-type { font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-type { font-size: 0.7rem; font-weight: 800; padding: 5px 10px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .bg-book { background-color: rgba(77, 171, 247, 0.2); color: #74c0fc; border: 1px solid rgba(77, 171, 247, 0.3); }
-        .bg-movie { background-color: rgba(255, 107, 107, 0.2); color: #ff8787; border: 1px solid rgba(255, 107, 107, 0.3); }
-        .bg-coffee { background-color: rgba(141, 110, 99, 0.2); color: #d7ccc8; border: 1px solid rgba(141, 110, 99, 0.3); }
+        .bg-book { background-color: rgba(77, 171, 247, 0.15); color: #74c0fc; border: 1px solid rgba(77, 171, 247, 0.4); }
+        .bg-movie { background-color: rgba(255, 107, 107, 0.15); color: #ff8787; border: 1px solid rgba(255, 107, 107, 0.4); }
+        .bg-coffee { background-color: rgba(161, 136, 127, 0.15); color: #d7ccc8; border: 1px solid rgba(161, 136, 127, 0.4); }
 
         /* MODALS */
         .modal-content {
             background-color: #1e1e1e;
-            border: 1px solid var(--border);
+            border: 1px solid #444;
             color: var(--text-main);
         }
-        .modal-header { border-bottom: 1px solid var(--border); }
-        .btn-close { filter: invert(1) grayscale(100%) brightness(200%); } /* Make close button white */
+        .modal-header { border-bottom: 1px solid #333; }
+        .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
 
         /* NAV */
         .bottom-nav {
             position: fixed; bottom: 0; width: 100%; height: var(--nav-height);
-            background-color: rgba(30, 30, 30, 0.95); /* Dark Translucent */
-            backdrop-filter: blur(10px);
-            border-top: 1px solid var(--border);
+            background-color: #181818; 
+            border-top: 1px solid #333;
             display: flex; justify-content: space-around; align-items: center;
             z-index: 1000;
             padding-bottom: env(safe-area-inset-bottom);
             height: calc(var(--nav-height) + env(safe-area-inset-bottom));
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
         }
         .nav-item {
             background: none; border: none; flex-grow: 1; text-align: center;
-            color: #666; font-size: 0.7rem; font-weight: 600; transition: color 0.2s;
+            color: #666; font-size: 0.75rem; font-weight: 700; transition: color 0.2s;
         }
-        .nav-item i { display: block; font-size: 1.5rem; margin-bottom: 4px; }
-        .nav-item.active { color: var(--primary); }
+        .nav-item i { display: block; font-size: 1.6rem; margin-bottom: 6px; }
+        .nav-item.active { color: var(--primary); text-shadow: 0 0 8px rgba(77, 171, 247, 0.4); }
 
-        .tab-content { display: none; padding: 15px; padding-top: 20px; }
+        .tab-content { display: none; padding: 20px 15px; }
         .tab-content.active { display: block; }
         .d-none { display: none !important; }
         
-        /* CHECKBOX */
         .form-check-input {
             background-color: var(--input-bg);
             border-color: var(--border);
@@ -220,29 +245,31 @@
 </head>
 <body>
 
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast-box">Saved Successfully!</div>
+
     <!-- === VIEW 1: HQ === -->
     <div id="view-hq" class="tab-content active">
         <h2 class="mb-4">Nexus OS</h2>
         
         <!-- Google Docs Journal -->
         <div class="nexus-card">
-            <h5 class="text-main mb-3"><i class="fa-solid fa-file-word me-2 text-primary"></i>Journal</h5>
+            <h5 class="mb-3"><i class="fa-solid fa-file-word me-2 text-primary"></i>Journal</h5>
             
             <div class="input-group mb-3">
                 <input type="text" id="docTitleInput" class="form-control" placeholder="Entry Title (Optional)">
-                <button onclick="createJournalDoc()" class="btn btn-primary fw-bold">
-                    <i class="fa-solid fa-plus me-1"></i> New Doc
+                <button onclick="createJournalDoc()" class="btn btn-primary fw-bold px-4">
+                    <i class="fa-solid fa-plus"></i>
                 </button>
             </div>
             
-            <!-- Journal Search inside HQ -->
             <div class="input-group mb-3">
                 <span class="input-group-text border-end-0"><i class="fa-solid fa-search"></i></span>
                 <input type="text" id="journalSearchInput" class="form-control border-start-0 ps-0" placeholder="Search logs..." onkeyup="searchJournal(event)">
             </div>
 
             <div id="journal-feed">
-                <div class="text-muted small text-center py-2">Loading Docs...</div>
+                <div class="text-muted small text-center py-3">Loading Docs...</div>
             </div>
         </div>
 
@@ -279,7 +306,7 @@
         <!-- Legend -->
         <div class="d-flex align-items-center justify-content-between px-2 mt-2 mb-3">
             <small class="text-muted fw-bold">1</small>
-            <div class="flex-grow-1 mx-3" style="height: 6px; background: linear-gradient(to right, var(--heat-min), var(--heat-max)); border-radius: 4px;"></div>
+            <div class="flex-grow-1 mx-3" style="height: 8px; background: linear-gradient(to right, var(--heat-min), var(--heat-max)); border-radius: 4px;"></div>
             <small class="text-muted fw-bold" id="legend-max">Max</small>
         </div>
 
@@ -537,6 +564,16 @@
             }
         }
 
+        // --- TOAST HELPER ---
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
         // --- CREATE DOC ---
         function createJournalDoc() {
             const titleInput = document.getElementById('docTitleInput');
@@ -550,6 +587,7 @@
             .then(res => res.json())
             .then(data => {
                 if(data.status === 'success') {
+                    showToast("Journal Created!");
                     window.open(data.url, '_blank'); 
                     titleInput.value = "";
                     loadDashboard(); 
@@ -572,6 +610,7 @@
             .then(res => res.json())
             .then(data => {
                 if (!Array.isArray(data)) return;
+                // FILTER: Remove Music and clean data
                 fullData = data
                     .filter(d => d.Type !== 'Music') 
                     .map(d => ({
@@ -635,18 +674,19 @@
             mapInstance = new jsVectorMap({
                 selector: "#world-map",
                 map: "world",
-                zoomButtons: false,
+                zoomButtons: true, // Enable Zoom Buttons
+                zoomOnScroll: false, // DISABLE SCROLL ZOOM
                 visualizeData: {
-                    scale: ['#1c4e80', '#00d2ff'], // Dark Mode Heatmap
+                    scale: ['#0d6efd', '#00ffff'], // DARK MODE: Blue to Cyan
                     values: mapValues
                 },
                 regionStyle: {
                     initial: { 
-                        fill: '#2d2d2d', 
-                        stroke: '#121212', 
+                        fill: '#383838', // GREY BASE (Unvisited)
+                        stroke: '#1e1e1e', 
                         strokeWidth: 0.5 
                     },
-                    hover: { fill: '#404040', cursor: 'pointer' },
+                    hover: { fill: '#505050', cursor: 'pointer' },
                     selected: { fill: '#4dabf7' }
                 },
                 series: { 
@@ -744,6 +784,7 @@
             populateCountryDropdown();
             renderMap(); renderHistory(); renderBacklog();
             closeModal();
+            showToast("Entry Saved!");
             fetch(`${API_URL}?action=logMovie&title=${encodeURIComponent(title)}&type=${type}&rating=${rating}&status=${status}&date=${date}`);
         }
 
