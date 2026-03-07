@@ -18,42 +18,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap/dist/css/jsvectormap.min.css" />
 
-    <!-- ONESIGNAL PUSH SDK -->
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "ae685f03-39c0-469a-b5ce-02ead2d64635",
-      safari_web_id: "web.onesignal.auto.487bfeae-71a3-407e-85d8-1b40bd783a80",
-      notifyButton: {
-        enable: true,
-      },
-    });
-  });
-</script>
-
     <style>
         :root {
-            /* DARK THEME PALETTE */
-            --bg-body: #121212;       /* Black Background */
-            --bg-card: #1e1e1e;       /* Dark Grey Surface */
-            --text-main: #ffffff;     /* Pure White for Max Contrast */
-            --text-muted: #b0b3b8;    /* Light Grey */
-            --border: #333333;        /* Visible Border */
-            --input-bg: #2c2c2c;      /* Input Fields */
+            --bg-body: #121212;       
+            --bg-card: #1e1e1e;       
+            --text-main: #ffffff;     
+            --text-muted: #b0b3b8;    
+            --border: #333333;        
+            --input-bg: #2c2c2c;      
             
             --primary: #4dabf7;       
             --success: #2ecc71;       
             
-            /* MAP COLORS - FIXED CONTRAST */
-            --map-base: #383838;      /* Distinct Grey for Empty Countries */
-            --map-border: #1e1e1e;    /* Matches Card BG for separation */
-            --map-hover: #505050;     /* Lighter Grey on Hover */
-            
-            /* Heatmap: Primary Blue -> Bright Neon Cyan */
-            --heat-min: #0d6efd;      /* 1 Visit = Bright Blue (Highly Visible) */
-            --heat-max: #00ffff;      /* Max Visits = Neon Cyan (Glowing) */
+            --map-base: #383838;      
+            --map-border: #1e1e1e;    
+            --map-hover: #505050;     
+            --heat-min: #0d6efd;      
+            --heat-max: #00ffff;      
 
             --nav-height: 75px;
         }
@@ -68,7 +49,6 @@
         h2 { font-weight: 900; color: var(--text-main); font-size: 1.8rem; letter-spacing: -0.5px; margin-bottom: 20px; }
         h5 { font-weight: 800; font-size: 1.1rem; margin-bottom: 15px; color: var(--text-main); letter-spacing: 0.3px; }
 
-        /* CARDS */
         .nexus-card {
             background-color: var(--bg-card);
             border-radius: 18px;
@@ -78,7 +58,6 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
         }
 
-        /* INPUTS & SELECTS */
         .form-control, .form-select {
             background-color: var(--input-bg);
             border: 1px solid var(--border);
@@ -93,14 +72,9 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.4);
         }
-        .input-group-text {
-            background-color: var(--input-bg);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-        }
+        .input-group-text { background-color: var(--input-bg); border: 1px solid var(--border); color: var(--text-muted); }
         ::placeholder { color: #888 !important; opacity: 1; }
 
-        /* TOAST NOTIFICATION */
         .toast-box {
             position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
             background: rgba(46, 204, 113, 0.95); color: #000; padding: 12px 24px;
@@ -110,72 +84,25 @@
         }
         .toast-box.show { opacity: 1; bottom: 100px; }
 
-        /* MAP CONTAINER */
         #world-map {
-            width: 100%;
-            height: 500px; 
-            background-color: var(--bg-card); /* Match card */
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid var(--border); /* Define edges */
+            width: 100%; height: 500px; background-color: var(--bg-card);
+            border-radius: 16px; overflow: hidden; border: 1px solid var(--border);
         }
-        
-        /* Map Tooltip */
-        .jvm-tooltip {
-            background-color: #000;
-            border: 1px solid #444;
-            border-radius: 8px;
-            padding: 10px 14px;
-            font-family: sans-serif;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
-            z-index: 9999;
-            color: white;
-        }
-        
-        /* Map Zoom Buttons (Restyled for Dark Mode) */
-        .jvm-zoom-btn {
-            background-color: #333 !important;
-            color: white !important;
-            border: 1px solid #555 !important;
-            padding: 5px !important;
-            border-radius: 4px !important;
-        }
+        .jvm-tooltip { background-color: #000; border: 1px solid #444; border-radius: 8px; padding: 10px 14px; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.8); z-index: 9999; color: white; }
+        .jvm-zoom-btn { background-color: #333 !important; color: white !important; border: 1px solid #555 !important; padding: 5px !important; border-radius: 4px !important; }
 
-        /* STATS */
         .stat-number { font-size: 2.2rem; font-weight: 900; color: var(--primary); line-height: 1; text-shadow: 0 0 10px rgba(77, 171, 247, 0.2); }
         .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-top: 8px;}
 
-        /* FILTERS */
         .filter-container { white-space: nowrap; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; }
-        .filter-btn {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 8px 20px;
-            border-radius: 24px;
-            font-size: 0.9rem;
-            margin-right: 8px;
-            font-weight: 700;
-            transition: all 0.2s;
-        }
-        .filter-btn.active {
-            background-color: var(--primary);
-            color: #121212;
-            border-color: var(--primary);
-            box-shadow: 0 0 12px rgba(77, 171, 247, 0.5);
-        }
+        .filter-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 20px; border-radius: 24px; font-size: 0.9rem; margin-right: 8px; font-weight: 700; transition: all 0.2s; }
+        .filter-btn.active { background-color: var(--primary); color: #121212; border-color: var(--primary); box-shadow: 0 0 12px rgba(77, 171, 247, 0.5); }
 
-        /* TASKS */
-        .task-item {
-            display: flex; align-items: center; 
-            padding: 14px 0; border-bottom: 1px solid var(--border);
-        }
+        .task-item { display: flex; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border); }
         .task-item:last-child { border-bottom: none; }
         .task-icon { color: #6c757d; font-size: 1.2rem; margin-right: 14px; flex-shrink: 0; }
         .task-text { flex-grow: 1; font-weight: 600; font-size: 1rem; line-height: 1.4; color: var(--text-main); }
         .task-date-col { font-size: 0.8rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; min-width: 70px; text-align: right; }
-        
         .prio-high { color: #ff6b6b; text-shadow: 0 0 5px rgba(255, 107, 107, 0.4); }
         .prio-med { color: #fcc419; }
         .prio-low { color: #4dabf7; }
@@ -183,119 +110,66 @@
         .date-today { color: #2ecc71; font-weight: 800; }
         .date-future { color: #888; }
 
-        /* JOURNAL LINKS */
-        .journal-item {
-            border-left: 4px solid var(--primary);
-            padding-left: 14px;
-            margin-bottom: 14px;
-            display: block;
-            text-decoration: none;
-            transition: all 0.2s;
-            background: linear-gradient(90deg, rgba(77, 171, 247, 0.05) 0%, transparent 100%);
-            padding: 10px 14px;
-            border-radius: 0 8px 8px 0;
-        }
+        .journal-item { border-left: 4px solid var(--primary); padding-left: 14px; margin-bottom: 14px; display: block; text-decoration: none; transition: all 0.2s; background: linear-gradient(90deg, rgba(77, 171, 247, 0.05) 0%, transparent 100%); padding: 10px 14px; border-radius: 0 8px 8px 0; }
         .journal-item:hover { background: rgba(77, 171, 247, 0.1); }
         .journal-date { font-size: 0.75rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
         .journal-text { font-size: 1rem; color: var(--text-main); font-weight: 600; margin-top: 4px; }
 
-        /* LISTS */
-        .history-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border);
-        }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
         .history-item:last-child { border-bottom: none; }
         .item-title { font-weight: 700; font-size: 1rem; margin-bottom: 4px; color: var(--text-main);}
         .item-meta { font-size: 0.8rem; color: var(--text-muted); }
         .item-rating { font-size: 0.8rem; color: #fcc419; }
 
-        /* DARK MODE BADGES */
         .badge-type { font-size: 0.7rem; font-weight: 800; padding: 5px 10px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        
         .bg-book { background-color: rgba(77, 171, 247, 0.15); color: #74c0fc; border: 1px solid rgba(77, 171, 247, 0.4); }
         .bg-movie { background-color: rgba(255, 107, 107, 0.15); color: #ff8787; border: 1px solid rgba(255, 107, 107, 0.4); }
         .bg-coffee { background-color: rgba(161, 136, 127, 0.15); color: #d7ccc8; border: 1px solid rgba(161, 136, 127, 0.4); }
 
-        /* MODALS */
-        .modal-content {
-            background-color: #1e1e1e;
-            border: 1px solid #444;
-            color: var(--text-main);
-        }
+        .modal-content { background-color: #1e1e1e; border: 1px solid #444; color: var(--text-main); }
         .modal-header { border-bottom: 1px solid #333; }
         .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
 
-        /* NAV */
-        .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; height: var(--nav-height);
-            background-color: #181818; 
-            border-top: 1px solid #333;
-            display: flex; justify-content: space-around; align-items: center;
-            z-index: 1000;
-            padding-bottom: env(safe-area-inset-bottom);
-            height: calc(var(--nav-height) + env(safe-area-inset-bottom));
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
-        }
-        .nav-item {
-            background: none; border: none; flex-grow: 1; text-align: center;
-            color: #666; font-size: 0.75rem; font-weight: 700; transition: color 0.2s;
-        }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: var(--nav-height); background-color: #181818; border-top: 1px solid #333; display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); height: calc(var(--nav-height) + env(safe-area-inset-bottom)); box-shadow: 0 -4px 20px rgba(0,0,0,0.5); }
+        .nav-item { background: none; border: none; flex-grow: 1; text-align: center; color: #666; font-size: 0.75rem; font-weight: 700; transition: color 0.2s; }
         .nav-item i { display: block; font-size: 1.6rem; margin-bottom: 6px; }
         .nav-item.active { color: var(--primary); text-shadow: 0 0 8px rgba(77, 171, 247, 0.4); }
 
         .tab-content { display: none; padding: 20px 15px; }
         .tab-content.active { display: block; }
         .d-none { display: none !important; }
-        
-        .form-check-input {
-            background-color: var(--input-bg);
-            border-color: var(--border);
-        }
-        .form-check-input:checked {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
+        .form-check-input { background-color: var(--input-bg); border-color: var(--border); }
+        .form-check-input:checked { background-color: var(--primary); border-color: var(--primary); }
     </style>
 </head>
 <body>
 
-    <!-- TOAST NOTIFICATION -->
     <div id="toast" class="toast-box">Saved Successfully!</div>
 
     <!-- === VIEW 1: HQ === -->
     <div id="view-hq" class="tab-content active">
-        
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="mb-0">Nexus OS</h2>
-            <!-- Push Notification Button -->
-            <button class="btn btn-outline-secondary btn-sm" onclick="promptForPush()">
+            <button class="btn btn-outline-secondary btn-sm" onclick="enablePushNotifications()">
                 <i class="fa-regular fa-bell"></i>
             </button>
         </div>
         
-        <!-- Google Docs Journal -->
         <div class="nexus-card">
             <h5 class="mb-3"><i class="fa-solid fa-file-word me-2 text-primary"></i>Journal</h5>
-            
             <div class="input-group mb-3">
                 <input type="text" id="docTitleInput" class="form-control" placeholder="Entry Title (Optional)">
-                <button onclick="createJournalDoc()" class="btn btn-primary fw-bold px-4">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
+                <button onclick="createJournalDoc()" class="btn btn-primary fw-bold px-4"><i class="fa-solid fa-plus"></i></button>
             </div>
-            
             <div class="input-group mb-3">
                 <span class="input-group-text border-end-0"><i class="fa-solid fa-search"></i></span>
                 <input type="text" id="journalSearchInput" class="form-control border-start-0 ps-0" placeholder="Search logs..." onkeyup="searchJournal(event)">
             </div>
-
             <div id="journal-feed">
                 <div class="text-muted small text-center py-3">Loading Docs...</div>
             </div>
         </div>
 
-        <!-- TickTick Tasks -->
         <div class="nexus-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="mb-0"><i class="fa-solid fa-check-circle me-2 text-success"></i>Today's Tasks</h5>
@@ -314,24 +188,18 @@
                 <i class="fa-solid fa-plus me-1"></i> Log
             </button>
         </div>
-        
-        <!-- Filters -->
         <div class="d-flex mb-3 filter-container">
             <button class="filter-btn active" onclick="filterMap('All')" data-filter="All">All</button>
             <button class="filter-btn" onclick="filterMap('Book')" data-filter="Book">Books</button>
             <button class="filter-btn" onclick="filterMap('Movie')" data-filter="Movie">Movies</button>
             <button class="filter-btn" onclick="filterMap('Coffee')" data-filter="Coffee">Coffee</button>
         </div>
-
         <div id="world-map" class="shadow-sm"></div>
-        
-        <!-- Legend -->
         <div class="d-flex align-items-center justify-content-between px-2 mt-2 mb-3">
             <small class="text-muted fw-bold">1</small>
             <div class="flex-grow-1 mx-3" style="height: 8px; background: linear-gradient(to right, var(--heat-min), var(--heat-max)); border-radius: 4px;"></div>
             <small class="text-muted fw-bold" id="legend-max">Max</small>
         </div>
-
         <div class="row g-3">
             <div class="col-6">
                 <div class="nexus-card text-center py-3 mb-0">
@@ -359,7 +227,6 @@
     <!-- === VIEW 4: HISTORY === -->
     <div id="view-history" class="tab-content">
         <h2 class="mb-3">History</h2>
-        
         <div class="row g-2 mb-3">
             <div class="col-6">
                 <select id="filterType" class="form-select" onchange="renderHistory()">
@@ -376,7 +243,6 @@
                 </select>
             </div>
         </div>
-
         <input type="text" id="historySearch" class="form-control mb-3 shadow-sm" placeholder="Search by name..." onkeyup="renderHistory()">
         <div id="history-container" class="nexus-card p-0 px-3 border-0 bg-transparent shadow-none"></div>
     </div>
@@ -401,19 +267,15 @@
               <label class="small text-muted fw-bold mb-1 ms-1">TYPE</label>
               <select id="mType" class="form-select mb-3">
                   <option value="Movie" selected>Movie</option>
-                  <option value="Music">Music</option>
                   <option value="Series">Series</option>
                   <option value="Coffee">Coffee</option>
               </select>
-
               <label class="small text-muted fw-bold mb-1 ms-1">TITLE / NAME</label>
               <input type="text" id="mTitle" class="form-control mb-3" placeholder="e.g. Inception or Blue Tokai">
-              
               <div class="form-check form-switch mb-4 p-3 rounded" style="background-color: var(--input-bg); margin-left: 0;">
                   <input class="form-check-input ms-0 me-2" type="checkbox" id="watchedCheck" onchange="toggleRatingFields()">
                   <label class="form-check-label small fw-bold" for="watchedCheck">Finished / Visited</label>
               </div>
-
               <div id="ratingFields" class="d-none">
                   <label class="small text-muted fw-bold mb-1 ms-1">RATING</label>
                   <select id="mRating" class="form-select mb-3">
@@ -423,17 +285,14 @@
                       <option value="2">⭐⭐ Poor</option>
                       <option value="1">⭐ Terrible</option>
                   </select>
-                  
                   <label class="small text-muted fw-bold mb-1 ms-1">DATE FINISHED</label>
                   <input type="date" id="mDate" class="form-control">
               </div>
-              
               <button class="btn btn-primary w-100 fw-bold py-3 mt-2 rounded-pill shadow-sm" onclick="handleSave()">Save</button>
             </div>
           </div>
         </div>
     </div>
-
     <div id="countryModal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
           <div class="modal-content shadow-lg" style="border-radius: 20px;">
@@ -451,33 +310,69 @@
     <script src="https://cdn.jsdelivr.net/npm/jsvectormap"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/maps/world.js"></script>
 
+    <!-- FIREBASE SDK v11 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-messaging.js";
+
+        // --- PASTE YOUR FIREBASE CONFIG HERE ---
+       const firebaseConfig = {
+  apiKey: "AIzaSyAam1HxZANk_AjQG_nScjoYBPGB8y2Xf-8",
+  authDomain: "nexus-os-949c4.firebaseapp.com",
+  projectId: "nexus-os-949c4",
+  storageBucket: "nexus-os-949c4.firebasestorage.app",
+  messagingSenderId: "329666668961",
+  appId: "1:329666668961:web:df7689e4ea2c3e9119c3e0",
+  measurementId: "G-DR9QGBXTK6"
+};
+        // ----------------------------------------
+
+        const app = initializeApp(firebaseConfig);
+        const messaging = getMessaging(app);
+
+        // Expose function to global scope so our button can call it
+        window.enablePushNotifications = async function() {
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    // PASTE YOUR VAPID KEY HERE
+                    const token = await getToken(messaging, { vapidKey: 'BIYumDT9UQcvUokEnwwUN6k8rLoml9FWnhFLfIPeSd8uZ7FoIl5HxjWJbWTxhDq7oTYzE0ezDblzIzkgChXHz7M' });
+                    if (token) {
+                        // Send Token to Apps Script Backend
+                        fetch(`${API_URL}?action=registerFCMToken&token=${token}`);
+                        showToast("Push Notifications Enabled!");
+                    }
+                } else {
+                    alert("Notification permission denied.");
+                }
+            } catch (error) {
+                console.error('Error enabling push:', error);
+            }
+        };
+
+        // Handle foreground notifications
+        onMessage(messaging, (payload) => {
+            showToast(payload.notification.title + ": " + payload.notification.body);
+        });
+    </script>
+
     <script>
-        // *** IMPORTANT: PASTE YOUR GAS DEPLOYMENT URL HERE ***
         const API_URL = "https://script.google.com/macros/s/AKfycbzEdsHSoG_yfkB_lMKe7RjQoCvd9d0egA1s7LXtuSz8Se6WLjIHSeNQlK0-xOO9C7yw/exec";
         
         let fullData = [];
         let dashboardCache = null;
         let mapInstance = null;
         let currentFilter = 'All';
-        
         let movieModal = null;
         let countryModal = null;
 
-        // HELPER: Normalize Country Codes
         function normalizeCountryCode(code) {
             if (!code) return null;
             let c = code.toString().trim().toUpperCase();
-            const map = {
-                'USA': 'US', 'UNITED STATES': 'US', 'U.S.A.': 'US',
-                'UK': 'GB', 'UNITED KINGDOM': 'GB', 'GREAT BRITAIN': 'GB', 'ENGLAND': 'GB',
-                'UAE': 'AE',
-                'S. KOREA': 'KR', 'SOUTH KOREA': 'KR', 'KOREA': 'KR',
-                'RUSSIA': 'RU', 'VIETNAM': 'VN', 'GERMANY': 'DE', 'JAPAN': 'JP'
-            };
+            const map = { 'USA': 'US', 'UNITED STATES': 'US', 'U.S.A.': 'US', 'UK': 'GB', 'UNITED KINGDOM': 'GB', 'GREAT BRITAIN': 'GB', 'ENGLAND': 'GB', 'UAE': 'AE', 'S. KOREA': 'KR', 'SOUTH KOREA': 'KR', 'KOREA': 'KR', 'RUSSIA': 'RU', 'VIETNAM': 'VN', 'GERMANY': 'DE', 'JAPAN': 'JP' };
             return map[c] || c;
         }
 
-        // NAVIGATION
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -486,40 +381,29 @@
 
             if(tabName === 'world' && fullData.length === 0) fetchData(); 
             else if(tabName === 'world') setTimeout(renderMap, 100); 
-            
             if(tabName === 'hq') loadDashboard();
         }
 
-        // --- DASHBOARD (HQ) ---
         function loadDashboard() {
-            fetch(`${API_URL}?action=getDashboard`)
-            .then(res => res.json())
-            .then(data => {
-                dashboardCache = data;
-                renderDashboard(data);
-            });
+            fetch(`${API_URL}?action=getDashboard`).then(res => res.json()).then(data => { dashboardCache = data; renderDashboard(data); });
         }
 
         function renderDashboard(data) {
             const taskContainer = document.getElementById('task-list');
             let tasks = (data.tasks || []).filter(t => {
                 if (!t.dueDate) return false;
-                const d = new Date(t.dueDate);
-                const now = new Date();
-                d.setHours(0,0,0,0);
-                now.setHours(0,0,0,0);
+                const d = new Date(t.dueDate); const now = new Date();
+                d.setHours(0,0,0,0); now.setHours(0,0,0,0);
                 return d <= now; 
             });
             tasks.sort((a, b) => b.priority - a.priority || new Date(a.dueDate) - new Date(b.dueDate));
 
-            if(tasks.length === 0) {
-                taskContainer.innerHTML = '<div class="text-center text-muted small py-3">No tasks due today.</div>';
+            if(tasks.length === 0) { taskContainer.innerHTML = '<div class="text-center text-muted small py-3">No tasks due today.</div>';
             } else {
                 taskContainer.innerHTML = tasks.map(t => {
                     let dateHtml = "";
                     if (t.dueDate) {
-                        const dateObj = new Date(t.dueDate);
-                        const now = new Date();
+                        const dateObj = new Date(t.dueDate); const now = new Date();
                         const isToday = dateObj.toDateString() === now.toDateString();
                         const isOverdue = dateObj < now && !isToday;
                         const timeStr = t.isAllDay ? "" : dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
@@ -528,159 +412,81 @@
                         dateHtml = `<span class="${dateClass}">${dateStr} ${timeStr}</span>`;
                     }
                     let prioClass = "prio-none";
-                    if (t.priority === 5) prioClass = "prio-high";
-                    else if (t.priority === 3) prioClass = "prio-med";
-                    else if (t.priority === 1) prioClass = "prio-low";
-
-                    return `
-                    <div class="task-item">
-                        <i class="fa-regular fa-circle task-icon ${prioClass}"></i>
-                        <div class="task-text">${t.title}</div>
-                        <div class="task-date-col">${dateHtml}</div>
-                    </div>
-                `}).join('');
+                    if (t.priority === 5) prioClass = "prio-high"; else if (t.priority === 3) prioClass = "prio-med"; else if (t.priority === 1) prioClass = "prio-low";
+                    return `<div class="task-item"><i class="fa-regular fa-circle task-icon ${prioClass}"></i><div class="task-text">${t.title}</div><div class="task-date-col">${dateHtml}</div></div>`;
+                }).join('');
             }
-
             renderJournalList(data.journal);
         }
 
         function renderJournalList(journalItems) {
             const journalContainer = document.getElementById('journal-feed');
             if(journalItems && journalItems.length > 0) {
-                journalContainer.innerHTML = journalItems.map(j => `
-                    <a href="${j.url}" target="_blank" class="journal-item">
-                        <div class="journal-date">${j.date}</div>
-                        <div class="journal-text">${j.title} <i class="fa-solid fa-arrow-up-right-from-square small ms-1" style="font-size:0.7em"></i></div>
-                    </a>
-                `).join('');
-            } else {
-                journalContainer.innerHTML = '<div class="text-center text-muted small py-2">No journals found.</div>';
-            }
+                journalContainer.innerHTML = journalItems.map(j => `<a href="${j.url}" target="_blank" class="journal-item"><div class="journal-date">${j.date}</div><div class="journal-text">${j.title} <i class="fa-solid fa-arrow-up-right-from-square small ms-1" style="font-size:0.7em"></i></div></a>`).join('');
+            } else { journalContainer.innerHTML = '<div class="text-center text-muted small py-2">No journals found.</div>'; }
         }
 
-        // --- JOURNAL SEARCH ---
         function searchJournal(e) {
             if (e.key === 'Enter') {
                 const query = document.getElementById('journalSearchInput').value;
                 const container = document.getElementById('journal-feed');
-                
-                if (!query) {
-                    if (dashboardCache) renderJournalList(dashboardCache.journal);
-                    return;
-                }
-
+                if (!query) { if (dashboardCache) renderJournalList(dashboardCache.journal); return; }
                 container.innerHTML = '<div class="text-center text-muted py-3"><i class="fa-solid fa-spinner fa-spin"></i> Searching full text...</div>';
-
-                fetch(`${API_URL}?action=searchJournal&query=${encodeURIComponent(query)}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.results.length === 0) {
-                        container.innerHTML = '<div class="text-center text-muted py-3">No matching entries found.</div>';
-                    } else {
-                        renderJournalList(data.results);
-                    }
-                })
-                .catch(err => {
-                    container.innerHTML = '<div class="text-center text-danger py-3">Search failed.</div>';
-                });
+                fetch(`${API_URL}?action=searchJournal&query=${encodeURIComponent(query)}`).then(res => res.json()).then(data => {
+                    if (data.results.length === 0) { container.innerHTML = '<div class="text-center text-muted py-3">No matching entries found.</div>';
+                    } else { renderJournalList(data.results); }
+                }).catch(err => { container.innerHTML = '<div class="text-center text-danger py-3">Search failed.</div>'; });
             }
         }
 
-        // --- TOAST HELPER ---
         function showToast(message) {
             const toast = document.getElementById('toast');
-            toast.innerText = message;
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            toast.innerText = message; toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
-        // --- CREATE DOC ---
         function createJournalDoc() {
-            const titleInput = document.getElementById('docTitleInput');
-            const title = titleInput.value;
-            const btn = event.target.closest('button');
-            const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
-            btn.disabled = true;
-
-            fetch(`${API_URL}?action=createJournalDoc&title=${encodeURIComponent(title)}`)
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    showToast("Journal Created!");
-                    window.open(data.url, '_blank'); 
-                    titleInput.value = "";
-                    loadDashboard(); 
-                } else {
-                    alert("Error: " + (data.message || "Failed"));
-                }
-                btn.innerHTML = originalHtml;
-                btn.disabled = false;
-            })
-            .catch(err => {
-                alert("⚠️ AUTH ERROR: Google Docs Permission Missing.\n\nFIX:\n1. Open your Google Script Editor.\n2. Run 'createJournalDoc' manually.\n3. Accept permissions.\n4. Redeploy as 'New Version'.");
-                btn.innerHTML = originalHtml;
-                btn.disabled = false;
-            });
+            const titleInput = document.getElementById('docTitleInput'); const title = titleInput.value;
+            const btn = event.target.closest('button'); const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+            fetch(`${API_URL}?action=createJournalDoc&title=${encodeURIComponent(title)}`).then(res => res.json()).then(data => {
+                if(data.status === 'success') { showToast("Journal Created!"); window.open(data.url, '_blank'); titleInput.value = ""; loadDashboard(); 
+                } else { alert("Error: " + (data.message || "Failed")); }
+                btn.innerHTML = originalHtml; btn.disabled = false;
+            }).catch(err => { alert("⚠️ AUTH ERROR."); btn.innerHTML = originalHtml; btn.disabled = false; });
         }
 
-        // --- PASSPORT DATA ---
         function fetchData() {
-            fetch(`${API_URL}?action=getPassport`)
-            .then(res => res.json())
-            .then(data => {
+            fetch(`${API_URL}?action=getPassport`).then(res => res.json()).then(data => {
                 if (!Array.isArray(data)) return;
-                // FILTER: Remove Music and clean data
-                fullData = data
-                    .filter(d => d.Type !== 'Music') 
-                    .map(d => ({
-                        ...d,
-                        Rating: (d.Rating === "" || d.Rating == null) ? 0 : Number(d.Rating)
-                    }));
-                
-                populateCountryDropdown();
-                renderMap();
-                renderHistory();
-                renderBacklog();
+                fullData = data.filter(d => d.Type !== 'Music').map(d => ({ ...d, Rating: (d.Rating === "" || d.Rating == null) ? 0 : Number(d.Rating) }));
+                populateCountryDropdown(); renderMap(); renderHistory(); renderBacklog();
             });
         }
 
         function populateCountryDropdown() {
             const countries = [...new Set(fullData.map(d => normalizeCountryCode(d.Country_Code)).filter(c => c && c !== '??'))].sort();
             const select = document.getElementById('filterCountry');
-            select.innerHTML = '<option value="All">All Countries</option>' + 
-                countries.map(c => `<option value="${c}">${c}</option>`).join('');
+            select.innerHTML = '<option value="All">All Countries</option>' + countries.map(c => `<option value="${c}">${c}</option>`).join('');
         }
 
-        // MAP RENDERING
         function filterMap(type) {
             currentFilter = type;
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.getAttribute('data-filter') === type);
-            });
+            document.querySelectorAll('.filter-btn').forEach(btn => { btn.classList.toggle('active', btn.getAttribute('data-filter') === type); });
             renderMap();
         }
 
         function renderMap() {
             const activeItems = fullData.filter(d => d.Rating > 0);
             const filteredData = currentFilter === 'All' ? activeItems : activeItems.filter(d => d.Type.includes(currentFilter));
-
-            const countryStats = {};
-            let maxCount = 0; 
+            const countryStats = {}; let maxCount = 0; 
 
             filteredData.forEach(item => {
-                const code = item.Country_Code;
-                if(!code || code === '??') return;
+                const code = item.Country_Code; if(!code || code === '??') return;
                 const cleanCode = normalizeCountryCode(code);
-                
                 if(!countryStats[cleanCode]) countryStats[cleanCode] = { total: 0, Book: 0, Movie: 0, Coffee: 0 };
                 countryStats[cleanCode].total++;
-                
-                if (item.Type.includes('Book')) countryStats[cleanCode].Book++;
-                else if (item.Type.includes('Movie')) countryStats[cleanCode].Movie++;
-                else if (item.Type.includes('Coffee')) countryStats[cleanCode].Coffee++;
+                if (item.Type.includes('Book')) countryStats[cleanCode].Book++; else if (item.Type.includes('Movie')) countryStats[cleanCode].Movie++; else if (item.Type.includes('Coffee')) countryStats[cleanCode].Coffee++;
             });
 
             Object.values(countryStats).forEach(s => { if (s.total > maxCount) maxCount = s.total; });
@@ -688,53 +494,26 @@
 
             const mapValues = {};
             Object.keys(countryStats).forEach(code => mapValues[code] = countryStats[code].total);
-
             document.getElementById('stat-countries').innerText = Object.keys(countryStats).length;
             document.getElementById('stat-items').innerText = filteredData.length;
             document.getElementById('world-map').innerHTML = "";
 
             mapInstance = new jsVectorMap({
-                selector: "#world-map",
-                map: "world",
-                zoomButtons: true, // Enable Zoom Buttons
-                zoomOnScroll: false, // DISABLE SCROLL ZOOM
-                visualizeData: {
-                    scale: ['#0d6efd', '#00ffff'], // DARK MODE: Blue to Cyan
-                    values: mapValues
-                },
-                regionStyle: {
-                    initial: { 
-                        fill: '#383838', // GREY BASE (Unvisited)
-                        stroke: '#1e1e1e', 
-                        strokeWidth: 0.5 
-                    },
-                    hover: { fill: '#505050', cursor: 'pointer' },
-                    selected: { fill: '#4dabf7' }
-                },
-                series: { 
-                    regions: [{ 
-                        attribute: 'fill', 
-                        scale: ['#0d6efd', '#00ffff'], // Heatmap Gradient
-                        values: mapValues
-                    }] 
-                },
+                selector: "#world-map", map: "world", zoomButtons: true, zoomOnScroll: false,
+                visualizeData: { scale: ['#0d6efd', '#00ffff'], values: mapValues },
+                regionStyle: { initial: { fill: '#383838', stroke: '#1e1e1e', strokeWidth: 0.5 }, hover: { fill: '#505050', cursor: 'pointer' }, selected: { fill: '#4dabf7' } },
+                series: { regions: [{ attribute: 'fill', scale: ['#0d6efd', '#00ffff'], values: mapValues }] },
                 onRegionTooltipShow(event, tooltip, code) {
-                    const c = code.toUpperCase();
-                    const s = countryStats[c];
-                    if(s) {
-                        tooltip.text(`<div class="text-start"><div class="fw-bold mb-1 border-bottom pb-1 text-white">${tooltip.text()}</div><div class="d-flex align-items-center justify-content-between mb-1"><span class="small text-muted">Total</span><span class="badge bg-warning text-dark rounded-pill">${s.total}</span></div><div class="d-flex gap-2" style="font-size:0.75rem"><span class="text-primary">📘 ${s.Book}</span><span class="text-danger">🎬 ${s.Movie}</span><span style="color:#d7ccc8">☕ ${s.Coffee}</span></div></div>`, true);
-                    }
+                    const c = code.toUpperCase(); const s = countryStats[c];
+                    if(s) tooltip.text(`<div class="text-start"><div class="fw-bold mb-1 border-bottom pb-1 text-white">${tooltip.text()}</div><div class="d-flex align-items-center justify-content-between mb-1"><span class="small text-muted">Total</span><span class="badge bg-warning text-dark rounded-pill">${s.total}</span></div><div class="d-flex gap-2" style="font-size:0.75rem"><span class="text-primary">📘 ${s.Book}</span><span class="text-danger">🎬 ${s.Movie}</span><span style="color:#d7ccc8">☕ ${s.Coffee}</span></div></div>`, true);
                 },
                 onRegionClick(event, code) { showCountryDetails(code); }
             });
         }
 
-        // --- LISTS & MODALS ---
         function renderHistory() {
             const query = document.getElementById('historySearch').value.toLowerCase();
-            const typeFilter = document.getElementById('filterType').value;
-            const countryFilter = document.getElementById('filterCountry').value;
-
+            const typeFilter = document.getElementById('filterType').value; const countryFilter = document.getElementById('filterCountry').value;
             const completed = fullData.filter(d => d.Rating > 0).reverse();
             const filtered = completed.filter(d => {
                 const matchesSearch = d.Title && d.Title.toLowerCase().includes(query);
@@ -742,7 +521,6 @@
                 const matchesCountry = countryFilter === 'All' || normalizeCountryCode(d.Country_Code) === countryFilter;
                 return matchesSearch && matchesType && matchesCountry;
             });
-
             const html = filtered.map(d => `<div class="history-item"><div><div class="item-title">${d.Title}</div><div class="item-meta">${d.Creator || "?"} • <span class="fw-bold text-light">${d.Country_Code}</span></div></div><div class="text-end"><span class="badge-type ${getBadgeClass(d.Type)}">${d.Type}</span><div class="item-rating mt-1">${"★".repeat(Math.round(d.Rating))}</div></div></div>`).join('');
             document.getElementById('history-container').innerHTML = html || '<div class="text-muted text-center py-4">No history found.</div>';
         }
@@ -753,20 +531,11 @@
             document.getElementById('backlog-container').innerHTML = html || '<div class="text-center text-muted py-5">Watchlist empty.</div>';
         }
 
-        function getBadgeClass(type) {
-            if(!type) return "";
-            if(type.includes("Book")) return "bg-book";
-            if(type.includes("Movie")) return "bg-movie";
-            if(type.includes("Coffee")) return "bg-coffee";
-            return "";
-        }
+        function getBadgeClass(type) { if(!type) return ""; if(type.includes("Book")) return "bg-book"; if(type.includes("Movie")) return "bg-movie"; if(type.includes("Coffee")) return "bg-coffee"; return ""; }
 
         function showCountryDetails(code) {
             const cleanCode = normalizeCountryCode(code);
-            const countryItems = fullData.filter(d => {
-                const itemCode = normalizeCountryCode(d.Country_Code);
-                return itemCode === cleanCode && d.Rating > 0;
-            });
+            const countryItems = fullData.filter(d => { const itemCode = normalizeCountryCode(d.Country_Code); return itemCode === cleanCode && d.Rating > 0; });
             const modalBody = document.getElementById('countryModalBody');
             document.getElementById('countryModalTitle').innerText = `Visa Stamp: ${cleanCode}`;
             if (countryItems.length === 0) modalBody.innerHTML = '<div class="p-4 text-center text-muted">No finished items yet.</div>';
@@ -776,43 +545,25 @@
         }
         function closeCountryModal() { if(countryModal) countryModal.hide(); }
 
-        // --- SAVE LOGIC ---
         function showMovieModal() {
-            const el = document.getElementById('movieModal');
-            if(!movieModal) movieModal = new bootstrap.Modal(el);
-            movieModal.show();
-            document.getElementById('mTitle').value = "";
-            document.getElementById('mType').value = "Movie";
-            document.getElementById('watchedCheck').checked = false;
-            document.getElementById('ratingFields').classList.add('d-none');
-            document.getElementById('mDate').valueAsDate = new Date();
+            const el = document.getElementById('movieModal'); if(!movieModal) movieModal = new bootstrap.Modal(el);
+            movieModal.show(); document.getElementById('mTitle').value = ""; document.getElementById('mType').value = "Movie"; document.getElementById('watchedCheck').checked = false; document.getElementById('ratingFields').classList.add('d-none'); document.getElementById('mDate').valueAsDate = new Date();
         }
         function closeModal() { if(movieModal) movieModal.hide(); }
-        function toggleRatingFields() {
-            const isWatched = document.getElementById('watchedCheck').checked;
-            document.getElementById('ratingFields').classList.toggle('d-none', !isWatched);
-        }
+        function toggleRatingFields() { const isWatched = document.getElementById('watchedCheck').checked; document.getElementById('ratingFields').classList.toggle('d-none', !isWatched); }
+        
         function handleSave() {
-            const title = document.getElementById('mTitle').value;
-            const type = document.getElementById('mType').value;
-            const isWatched = document.getElementById('watchedCheck').checked;
+            const title = document.getElementById('mTitle').value; const type = document.getElementById('mType').value; const isWatched = document.getElementById('watchedCheck').checked;
             if(!title) { alert("Title required"); return; }
-            const rating = isWatched ? document.getElementById('mRating').value : 0;
-            const status = isWatched ? 'watched' : 'watchlist';
-            const date = isWatched ? document.getElementById('mDate').value : "";
+            const rating = isWatched ? document.getElementById('mRating').value : 0; const status = isWatched ? 'watched' : 'watchlist'; const date = isWatched ? document.getElementById('mDate').value : "";
             
             fullData.push({ Title: title, Creator: "Unknown", Type: type, Country_Code: "??", Rating: Number(rating) });
-            // Re-run renders
-            populateCountryDropdown();
-            renderMap(); renderHistory(); renderBacklog();
-            closeModal();
-            showToast("Entry Saved!");
+            populateCountryDropdown(); renderMap(); renderHistory(); renderBacklog();
+            closeModal(); showToast("Entry Saved!");
             fetch(`${API_URL}?action=logMovie&title=${encodeURIComponent(title)}&type=${type}&rating=${rating}&status=${status}&date=${date}`);
         }
 
-        // INIT
-        loadDashboard();
-        fetchData();
+        loadDashboard(); fetchData();
     </script>
 </body>
 </html>
