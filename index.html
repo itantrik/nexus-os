@@ -316,15 +316,15 @@
         import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-messaging.js";
 
         // --- PASTE YOUR FIREBASE CONFIG HERE ---
-       const firebaseConfig = {
-  apiKey: "AIzaSyAam1HxZANk_AjQG_nScjoYBPGB8y2Xf-8",
-  authDomain: "nexus-os-949c4.firebaseapp.com",
-  projectId: "nexus-os-949c4",
-  storageBucket: "nexus-os-949c4.firebasestorage.app",
-  messagingSenderId: "329666668961",
-  appId: "1:329666668961:web:df7689e4ea2c3e9119c3e0",
-  measurementId: "G-DR9QGBXTK6"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyAam1HxZANk_AjQG_nScjoYBPGB8y2Xf-8",
+            authDomain: "nexus-os-949c4.firebaseapp.com",
+            projectId: "nexus-os-949c4",
+            storageBucket: "nexus-os-949c4.firebasestorage.app",
+            messagingSenderId: "329666668961",
+            appId: "1:329666668961:web:df7689e4ea2c3e9119c3e0",
+            measurementId: "G-DR9QGBXTK6"
+        };
         // ----------------------------------------
 
         const app = initializeApp(firebaseConfig);
@@ -335,8 +335,17 @@
             try {
                 const permission = await Notification.requestPermission();
                 if (permission === 'granted') {
+                    
+                    // --- FIX: MANUALLY REGISTER SERVICE WORKER WITH RELATIVE PATH ---
+                    // This explicitly tells Firebase to look in the current subfolder instead of the root domain.
+                    const swRegistration = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+                    
                     // PASTE YOUR VAPID KEY HERE
-                    const token = await getToken(messaging, { vapidKey: 'BIYumDT9UQcvUokEnwwUN6k8rLoml9FWnhFLfIPeSd8uZ7FoIl5HxjWJbWTxhDq7oTYzE0ezDblzIzkgChXHz7M' });
+                    const token = await getToken(messaging, { 
+                        vapidKey: 'BIYumDT9UQcvUokEnwwUN6k8rLoml9FWnhFLfIPeSd8uZ7FoIl5HxjWJbWTxhDq7oTYzE0ezDblzIzkgChXHz7M',
+                        serviceWorkerRegistration: swRegistration // Pass the manual registration
+                    });
+
                     if (token) {
                         // Send Token to Apps Script Backend
                         fetch(`${API_URL}?action=registerFCMToken&token=${token}`);
@@ -347,6 +356,7 @@
                 }
             } catch (error) {
                 console.error('Error enabling push:', error);
+                alert("Push Error: " + error.message);
             }
         };
 
