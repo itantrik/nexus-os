@@ -1,14 +1,14 @@
 importScripts('https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/11.0.0/firebase-messaging-compat.js');
 
-// PASTE YOUR FIREBASE CONFIG HERE
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAam1HxZANk_AjQG_nScjoYBPGB8y2Xf-8",
+  authDomain: "nexus-os-949c4.firebaseapp.com",
+  projectId: "nexus-os-949c4",
+  storageBucket: "nexus-os-949c4.firebasestorage.app",
+  messagingSenderId: "329666668961",
+  appId: "1:329666668961:web:df7689e4ea2c3e9119c3e0",
+  measurementId: "G-DR9QGBXTK6"
 };
 
 firebase.initializeApp(firebaseConfig);
