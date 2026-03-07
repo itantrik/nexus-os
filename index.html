@@ -18,6 +18,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap/dist/css/jsvectormap.min.css" />
 
+    <!-- ONESIGNAL PUSH SDK -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "ae685f03-39c0-469a-b5ce-02ead2d64635",
+      safari_web_id: "web.onesignal.auto.487bfeae-71a3-407e-85d8-1b40bd783a80",
+      notifyButton: {
+        enable: true,
+      },
+    });
+  });
+</script>
+
     <style>
         :root {
             /* DARK THEME PALETTE */
@@ -250,7 +265,14 @@
 
     <!-- === VIEW 1: HQ === -->
     <div id="view-hq" class="tab-content active">
-        <h2 class="mb-4">Nexus OS</h2>
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Nexus OS</h2>
+            <!-- Push Notification Button -->
+            <button class="btn btn-outline-secondary btn-sm" onclick="promptForPush()">
+                <i class="fa-regular fa-bell"></i>
+            </button>
+        </div>
         
         <!-- Google Docs Journal -->
         <div class="nexus-card">
@@ -692,7 +714,7 @@
                 series: { 
                     regions: [{ 
                         attribute: 'fill', 
-                        scale: ['#1c4e80', '#00d2ff'], // Heatmap Gradient
+                        scale: ['#0d6efd', '#00ffff'], // Heatmap Gradient
                         values: mapValues
                     }] 
                 },
