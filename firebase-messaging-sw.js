@@ -1,6 +1,7 @@
-importScripts('https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/11.0.0/firebase-messaging-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging-compat.js');
 
+// Fill this with your Firebase Console Details
 const firebaseConfig = {
   apiKey: "AIzaSyAam1HxZANk_AjQG_nScjoYBPGB8y2Xf-8",
   authDomain: "nexus-os-949c4.firebaseapp.com",
@@ -11,15 +12,17 @@ const firebaseConfig = {
   measurementId: "G-DR9QGBXTK6"
 };
 
+// Initialize Firebase App
 firebase.initializeApp(firebaseConfig);
+
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage((payload) => {
+messaging.onBackgroundMessage(function(payload) {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: '/apple-touch-icon.png' // Matches your iOS icon
+    icon: '/icon.png' 
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
